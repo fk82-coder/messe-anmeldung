@@ -98,6 +98,13 @@
     leeren();
     setzeSprache(K.standardSprache);
     zeige('start');
+    neuLadenWennRuhig();
+  }
+  var neueFassung = false;
+  function neuLadenWennRuhig() {
+    if (!neueFassung || sendetGerade || !$('start').classList.contains('aktiv') || lang !== K.standardSprache) return;
+    neueFassung = false;
+    location.reload();
   }
   function leerlauf() {
     clearTimeout(leerTimer);
@@ -435,7 +442,12 @@
     wachHalten();
     if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-      navigator.serviceWorker.register('sw.js').catch(function () {});
+      var hatteSteuerung = !!navigator.serviceWorker.controller;
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        if (!hatteSteuerung) { hatteSteuerung = true; return; }
+        neueFassung = true; neuLadenWennRuhig();
+      });
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(function () {});
     }
     ansichtAusAdresse();
   }

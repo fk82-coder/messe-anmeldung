@@ -1,4 +1,4 @@
-var VERSION = 'messe-app-0.3.6';
+var VERSION = 'messe-app-0.3.7';
 var DATEIEN = [
   './', 'index.html', 'ok.html', 'planb.html', 'manifest.webmanifest', 'css/app.css',
   'js/konfiguration.js', 'js/texte.js', 'js/laender.js', 'js/speicher.js', 'js/versand.js', 'js/visitenkarte.js', 'js/app.js', 'js/planb.js', 'js/ok.js',
@@ -14,7 +14,10 @@ var window = self;
 try { importScripts('js/konfiguration.js'); } catch (e) {  }
 var MIT_VK = !!(self.KONFIG && self.KONFIG.visitenkarte && self.KONFIG.visitenkarte.aktiv);
 self.addEventListener('install', function (e) {
-  e.waitUntil(caches.open(VERSION).then(function (c) { return c.addAll(MIT_VK ? DATEIEN.concat(VK_DATEIEN) : DATEIEN); }).then(function () { return self.skipWaiting(); }));
+  var liste = MIT_VK ? DATEIEN.concat(VK_DATEIEN) : DATEIEN;
+  e.waitUntil(caches.open(VERSION).then(function (c) {
+    return c.addAll(liste.map(function (d) { return new Request(d, { cache: 'reload' }); }));
+  }).then(function () { return self.skipWaiting(); }));
 });
 self.addEventListener('activate', function (e) {
   e.waitUntil(caches.keys().then(function (alle) {
