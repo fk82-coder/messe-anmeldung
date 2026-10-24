@@ -109,7 +109,7 @@
   var kameraAussen = false, kameraAussenUhr = null;
   document.addEventListener('visibilitychange', function () {
     if (document.hidden && !sendetGerade) {
-      if (kameraAussen) { clearTimeout(kameraAussenUhr); kameraAussenUhr = setTimeout(function () { kameraAussen = false; neu(); }, 120000); }
+      if (kameraAussen || vkWache) { clearTimeout(kameraAussenUhr); kameraAussenUhr = setTimeout(function () { kameraAussen = false; neu(); }, 120000); }
       else neu();
     } else { clearTimeout(kameraAussenUhr); wachHalten(); }
   });
@@ -257,10 +257,45 @@
     vkKameraZu();
     $('vkLesen').classList.remove('an');
     kameraAussen = false; $('vkDatei').value = '';
+    vkWacheEnde();
     if (VK) VK.beenden();
   }
+  var IN_APP = !!VK && VK.inAppBrowser(navigator.userAgent);
+  function vkImBrowser() {
+    vkWacheEnde();
+    kameraAussen = false; clearTimeout(kameraAussenUhr);
+    if (VK) VK.beenden();
+    vkMeldung(text('vkImBrowser'), true);
+  }
+  var vkWache = null;
+  function vkWacheEnde() {
+    if (!vkWache) return;
+    clearTimeout(vkWache.uhr); clearTimeout(vkWache.schluss);
+    window.removeEventListener('blur', vkWache.auf); window.removeEventListener('pagehide', vkWache.auf);
+    document.removeEventListener('visibilitychange', vkWache.sicht);
+    vkWache = null;
+  }
+  function vkWachen() {
+    vkWacheEnde();
+    var w = { hinweis: false };
+    w.auf = function () {
+      if (w.hinweis && $('vkMeldung').textContent === text('vkImBrowser')) vkMeldung('');
+      if (w.hinweis) kameraAussen = true;
+      vkWacheEnde();
+    };
+    w.sicht = function () { if (document.hidden) w.auf(); };
+    w.uhr = setTimeout(function () {
+      w.hinweis = true; kameraAussen = false; VK.beenden();
+      vkMeldung(text('vkImBrowser'), true);
+    }, 2000);
+    w.schluss = setTimeout(vkWacheEnde, 30000);
+    window.addEventListener('blur', w.auf); window.addEventListener('pagehide', w.auf);
+    document.addEventListener('visibilitychange', w.sicht);
+    vkWache = w;
+  }
   function vkDateiWeg() {
-    try { kameraAussen = true; $('vkDatei').value = ''; $('vkDatei').click(); }
+    if (IN_APP) { vkImBrowser(); return; }
+    try { kameraAussen = true; $('vkDatei').value = ''; $('vkDatei').click(); vkWachen(); }
     catch (e) { kameraAussen = false; VK.beenden(); vkMeldung(text('vkKeineKamera'), true); }
   }
   var kameraInSeiteGesperrt = false;
@@ -278,7 +313,8 @@
       if (nr !== vkLaufNr) return;
       vkKameraZu();
       kameraInSeiteGesperrt = true;
-      if (!navigator.userActivation || navigator.userActivation.isActive) vkDateiWeg();
+      if (IN_APP) vkImBrowser();
+      else if (!navigator.userActivation || navigator.userActivation.isActive) vkDateiWeg();
       else vkMeldung(text('vkNochmal'), true);
     });
   }
@@ -290,7 +326,12 @@
     if (!bild) { VK.beenden(); vkMeldung(text('vkSchlecht'), true); return; }
     vkLesen(bild);
   });
+  function vkKameraWarDa() {
+    if ($('vkMeldung').textContent === text('vkImBrowser')) vkMeldung('');
+    vkWacheEnde();
+  }
   $('vkDatei').addEventListener('change', function () {
+    vkKameraWarDa();
     kameraAussen = false; clearTimeout(kameraAussenUhr);
     var f = this.files && this.files[0];
     this.value = '';
@@ -300,7 +341,7 @@
     VK.ausDatei(f).then(function (bild) { f = null; if (nr !== vkLaufNr) { VK._verwerfen(bild); return; } vkLesen(bild); },
       function () { f = null; $('vkLesen').classList.remove('an'); VK.beenden(); vkMeldung(text('vkSchlecht'), true); });
   });
-  $('vkDatei').addEventListener('cancel', function () { kameraAussen = false; clearTimeout(kameraAussenUhr); VK.beenden(); });
+  $('vkDatei').addEventListener('cancel', function () { vkKameraWarDa(); kameraAussen = false; clearTimeout(kameraAussenUhr); VK.beenden(); });
   function vkLesen(bild) {
     var nr = vkLaufNr;
     $('vkLesen').classList.add('an');

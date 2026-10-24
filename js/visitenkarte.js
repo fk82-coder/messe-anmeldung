@@ -12,9 +12,10 @@
   };
   function einst() { return K.visitenkarte || {}; }
   var TITEL = ['prof', 'dr', 'med', 'vet', 'rer', 'nat', 'dent', 'dipl', 'ing', 'phd', 'msc', 'bsc', 'mba', 'md', 'dvm', 'mag',
-    'univ', 'habil', 'dipling', 'diplbiol', 'diplchem', 'drmed', 'drmedvet', 'drrernat', 'frau', 'herr', 'mr', 'mrs', 'ms', 'miss', 'sen', 'jun', 'ba', 'ma', 'priv', 'doz', 'pd', 'biol', 'chem', 'oec', 'mult'];
+    'univ', 'habil', 'dipling', 'diplbiol', 'diplchem', 'drmed', 'drmedvet', 'drrernat', 'frau', 'herr', 'mr', 'mrs', 'ms', 'miss', 'sen', 'jun', 'ba', 'ma', 'priv', 'doz', 'pd', 'biol', 'chem', 'oec', 'mult',
+    'jr', 'sr', 'ii', 'iii', 'iv'];
   var PARTIKEL = ['von', 'van', 'de', 'der', 'den', 'zu', 'zum', 'zur', 'del', 'della', 'da', 'di', 'du', 'la', 'le', 'ten', 'ter', 'vom'];
-  var RECHTSFORM = /\b(GmbH|gGmbH|mbH|AG|KG|KGaA|OHG|GbR|PartG|e\.\s?V\.|eG|Ltd\.?|Limited|Inc\.?|LLC|Corp\.?|S\.A\.|S\.L\.|S\.r\.l\.|SpA|S\.p\.A\.|B\.V\.|N\.V\.|SE|SAS|plc)(?=$|[\s,.;)])/i;
+  var RECHTSFORM = /\b(GmbH|GMBH|Gmbh|gGmbH|mbH|AG|KG|KGaA|OHG|GbR|PartG|e\.\s?V\.|eG|Ltd\.?|LTD\.?|Limited|LIMITED|Inc\.?|INC\.?|LLC|Corp\.?|CORP\.?|S\.A\.|S\.L\.|S\.r\.l\.|SpA|S\.p\.A\.|B\.V\.|N\.V\.|SE|SAS|plc|PLC)(?=$|[\s,.;)])/;
   var EINRICHTUNG = /(praxis|klinik|klinikum|kliniken|tierarzt|tierärzt|labor\b|labore|laboratori|laborator|institut|universit|hochschule|hospital|krankenhaus|clinic|zentrum|center|centre|\bmvz\b|patholog|veterin|medizin|diagnosti|biotech|pharma|forschung|research|stiftung|foundation|gesundheit|health|apotheke|pharmacy|amt\b|behörde|ministerium|university|college|school|schule)/i;
   var POSITION = /(leiter|leiterin|leitung|head\b|director|direktor|manager|geschäftsführ|geschaeftsfuehr|inhaber|owner|\bceo\b|\bcfo\b|\bcoo\b|\bcto\b|chefarzt|oberarzt|oberärzt|fachtierarzt|fachtierärzt|facharzt|fachärzt|tierärztin|assistent|assistant|einkauf|purchas|procurement|beschaffung|vertrieb|\bsales\b|technolog|\bmta\b|\bmtla\b|\btfa\b|biolog|chemiker|scientist|researcher|wissenschaftl|professor|consultant|berater|referent|sachbearbeit|koordinator|coordinator|officer|specialist|spezialist|engineer|ingenieur|laborant|präsident|president|vorstand|partner|gesellschafter|prokurist|abteilung|department|bereich\b|team ?lead)/i;
   var ANSCHRIFT_PLZ = /\b(D-|A-|CH-)?\d{4,5}\s+[A-ZÄÖÜ][a-zäöüß]/;
@@ -28,29 +29,76 @@
   function ziffern(s) { return (s.match(/\d/g) || []).length; }
   function umlautFrei(s) { return s.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^a-z]/g, ''); }
   function gross(s) { return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase(); }
+  var SPALTE = '     ';
+  function symbolWeg(s) {
+    var w = String(s || '').trim().split(/\s+/), alt;
+    do {
+      alt = w.length;
+      if (w.length > 1 && !/[A-Za-z0-9ÄÖÜäöüßÀ-ÿ]/.test(w[0]) && !/^[+(]/.test(w[0])) w.shift();
+      else if (w.length > 1 && /^[A-Za-zÀ-ÿ]$/.test(w[0]) && !/^[TMFPEWtmfpew]$/.test(w[0]) && /^(\+|\(|\d|www\.|\S+@)/i.test(w[1])) w.shift();
+    } while (w.length < alt);
+    return w.join(' ');
+  }
+  var RECHTSFORM_ALLE = new RegExp(RECHTSFORM.source, 'g');
+  function nurRechtsform(s) {
+    return RECHTSFORM.test(s) && !s.replace(RECHTSFORM_ALLE, '').replace(/&|\+|\bCo\b\.?|\bund\b|\band\b|[,.\s]/gi, '');
+  }
   function zerlegen(text) {
     var aus = [];
     String(text || '').replace(/\r/g, '').split('\n').forEach(function (z) {
-      z = z.replace(/[ \t]/g, ' ').replace(/\s+/g, ' ').trim();
-      if (!z) return;
-      var teile = z.split(/\s+[·•|∙◦®«»*]\s+|\s+[-–—]\s+|\s{3,}/).map(function (t) { return t.trim(); }).filter(Boolean);
-      aus.push({ zeile: z, teile: teile });
+      var spalten = z.replace(/\t/g, SPALTE).split(/ {3,}/).map(function (s) { return symbolWeg(s.replace(/\s+/g, ' ')); }).filter(Boolean);
+      if (!spalten.length) return;
+      aus.push({ zeile: spalten.join(SPALTE), spalten: spalten, teile: [] });
+    });
+    aus.forEach(function (x, i) {
+      x.spalten = x.spalten.filter(function (s) {
+        if (i === 0 || !nurRechtsform(s)) return true;
+        var oben = aus[i - 1], k = oben.spalten.length - 1, o = oben.spalten[k];
+        if (!o || nurRechtsform(o) || /\d|@/.test(o) || istWeb(o)) return true;
+        oben.spalten[k] = o + ' ' + s; oben.zeile = oben.spalten.join(SPALTE);
+        return false;
+      });
+      x.zeile = x.spalten.join(SPALTE);
+    });
+    aus = aus.filter(function (x) { return x.spalten.length; });
+    aus.forEach(function (x) {
+      x.spalten.forEach(function (s) {
+        s.split(/\s+[·•|∙◦®«»*]\s+|\s+[-–—]\s+/).forEach(function (t) { t = t.trim(); if (t) x.teile.push(t); });
+      });
     });
     return aus;
   }
+  var ENDUNG_LANG = /^(example|museum|agency|company|digital|online|solutions|services|systems|network|technology|international|consulting|management|clinic|dental|academy|training|software|science|berlin|hamburg|koeln|cologne|bayern|saarland|tirol|vlaanderen|brussels|amsterdam|london|paris|madrid|barcelona|zuerich)$/;
+  var FREEMAIL = /^(gmail|googlemail|gmx|web|yahoo|outlook|hotmail|live|msn|icloud|me|aol|tonline|freenet|posteo|mailbox|protonmail|proton|arcor|vodafone|ionos|email|mail)$/;
   function emailFinden(text) {
-    var t = String(text || '')
-      .replace(/\s*[\(\[]\s*at\s*[\)\]]\s*/gi, '@')
-      .replace(/(\w)\s*[©®]\s*(\w)/g, '$1@$2')
-      .replace(/\s*@\s*/g, '@')
-      .split('\n').map(function (z) { return z.indexOf('@') >= 0 ? z.replace(/(\w)\s+\.\s*(?=\w)|(\w)\s*\.\s+(?=\w)/g, function (m, a, b) { return (a || b) + '.'; }) : z; }).join('\n');
-    var alle = t.match(/[A-Za-z0-9._%+\-]+@[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,}/g) || [];
-    alle = alle.map(function (e) { return e.replace(/^[._\-]+|[._\-]+$/g, '').toLowerCase(); })
-      .filter(function (e) { return /^[^@]+@[^@]+\.[a-z]{2,}$/.test(e); });
-    if (!alle.length) return '';
-    var persoenlich = alle.filter(function (e) { return !ALLGEMEIN.test(e.split('@')[0]); });
-    return (persoenlich[0] || alle[0]);
+    var kand = [];
+    String(text || '').split('\n').forEach(function (z) {
+      z = z.replace(/[ \t]*[\(\[][ \t]*at[ \t]*[\)\]][ \t]*/gi, '@')
+        .replace(/([A-Za-z0-9])[ \t]*[©®][ \t]*([A-Za-z0-9])/g, '$1@$2')
+        .replace(/[ \t]*@[ \t]*/g, '@');
+      if (z.indexOf('@') >= 0) z = z.replace(/(\w)[ \t]+\.[ \t]*(?=\w)|(\w)[ \t]*\.[ \t]+(?=\w)/g, function (m, a, b) { return (a || b) + '.'; });
+      (z.match(/[A-Za-z0-9._%+\-]+(?:@[A-Za-z0-9._%+\-]+)+/g) || []).forEach(function (tok) {
+        var p = tok.split('@');
+        for (var i = 1; i < p.length; i++) {
+          var lokal = p[i - 1].replace(/^[._\-]+|[._\-]+$/g, '');
+          var m = p[i].replace(/^[._\-]+/, '').toLowerCase().match(/^((?:[a-z0-9\-]+\.)+([a-z]{2,}))/);
+          if (!lokal || !m) continue;
+          if (m[2].length > 6 && !ENDUNG_LANG.test(m[2])) continue;
+          kand.push((lokal + '@' + m[1]).toLowerCase());
+        }
+      });
+    });
+    if (!kand.length) return '';
+    var gut = kand.filter(function (e) { return /[a-z]/.test(e.split('@')[0]); });
+    if (gut.length) kand = gut;
+    var persoenlich = kand.filter(function (e) { return !ALLGEMEIN.test(e.split('@')[0]); });
+    return (persoenlich[0] || kand[0]);
   }
+  function domainName(email) {
+    var d = umlautFrei(((email || '').split('@')[1] || '').split('.')[0] || '');
+    return d.length >= 4 && !FREEMAIL.test(d) ? firmenSchluessel(d) : '';
+  }
+  function firmenSchluessel(s) { return umlautFrei(s).replace(/ue|ii|ti|li|il/g, 'u'); }
   function istTelefon(s) { return ziffern(s) >= 7 && (TELEFON_ZEICHEN.test(s) || /^\+?\(?\d[\d\s()\/.\-–]+$/.test(s)); }
   function istAnschrift(s) { return ANSCHRIFT_PLZ.test(s) || (ANSCHRIFT_STRASSE.test(s) && /\d/.test(s)) || UK_POSTLEITZAHL.test(s) || /^\d+[a-z]?\s+\w+\s+(road|street|avenue|lane)/i.test(s); }
   function istWeb(s) { return s.indexOf('@') < 0 && WEB.test(s); }
@@ -88,15 +136,19 @@
   function auswerten(text, mitTelPos) {
     var z = zerlegen(text), f = { email: '', vorname: '', nachname: '', einrichtung: '' };
     if (mitTelPos) { f.telefon = ''; f.position = ''; }
-    f.email = emailFinden(text);
+    f.email = emailFinden(z.map(function (x) { return x.zeile; }).join('\n'));
     var ePlain = umlautFrei((f.email.split('@')[0] || ''));
+    var firma = domainName(f.email);
     var bester = null, besterWert = -99;
     z.forEach(function (x, nr) {
-      x.teile.concat(x.teile.length > 1 ? [x.zeile] : []).forEach(function (t) {
+      var kandidaten = x.teile.slice();
+      x.spalten.forEach(function (s) { if (kandidaten.indexOf(s) < 0) kandidaten.push(s); });
+      kandidaten.forEach(function (t) {
         if (istAusschluss(t)) return;
         var n = nameAusZeile(t); if (!n) return;
-        var wert = 1 - nr * 0.05;
         var nn = umlautFrei(n.nachname), vn = umlautFrei(n.vorname.split(' ')[0]);
+        if (firma && (firmenSchluessel(vn) === firma || firmenSchluessel(n.vorname + n.nachname) === firma)) return;
+        var wert = 1 - nr * 0.05;
         if (ePlain && nn.length > 1 && ePlain.indexOf(nn.replace(/-/g, '')) >= 0) wert += 5;
         if (ePlain && vn.length > 1 && ePlain.indexOf(vn) >= 0) wert += 2;
         if (wert > besterWert) { besterWert = wert; bester = n; }
@@ -110,10 +162,13 @@
         var rf = t.match(RECHTSFORM);
         if (rf && istAusschluss(t) && t.indexOf('@') < 0) t = t.slice(0, rf.index + rf[0].length);
         if (istAusschluss(t) || POSITION.test(t) && !RECHTSFORM.test(t)) return;
-        if (bester && t.indexOf(bester.nachname) >= 0 && !RECHTSFORM.test(t) && !EINRICHTUNG.test(t)) return;
+        if (nurRechtsform(t)) return;
+        var mitFirma = firma && firmenSchluessel(t).indexOf(firma) >= 0;
+        if (bester && t.indexOf(bester.nachname) >= 0 && !RECHTSFORM.test(t) && !EINRICHTUNG.test(t) && (!mitFirma || t.indexOf(bester.vorname) >= 0)) return;
         var w = 0;
-        if (RECHTSFORM.test(t)) w += 3;
+        if (RECHTSFORM.test(t) && t.replace(RECHTSFORM_ALLE, '').replace(/&|\+|\bCo\b\.?|[^A-Za-zÄÖÜäöüßÀ-ÿ]/g, '').length >= 4) w += 3;
         if (EINRICHTUNG.test(t)) w += 2;
+        if (mitFirma) w += 2 + ((t.match(/[A-Za-zÄÖÜäöüßÀ-ÿ]{3,}/g) || []).length > 1 ? 0.5 : 0);
         if (/^(department|abteilung|fachbereich|dept\.?)\b/i.test(t)) w -= 1.5;
         if (w <= 0) return;
         w -= nr * 0.05;
@@ -123,29 +178,73 @@
     f.einrichtung = einr ? aufraeumen(schoenSchreiben(einr)) : '';
     if (mitTelPos) {
       z.some(function (x) {
-        var ok = false;
-        x.zeile.split(/\s+[·•|∙◦]\s+|\s{2,}|(?=\b(?:Tel|Fon|Phone|Telefon|Mobil|Mobile|Handy|Fax|T|M|F)\b\.?\s*:?\s*\+?\d)/i).some(function (t) {
-          if (FAX.test(t) || t.indexOf('@') >= 0 || istAnschrift(t) && !TELEFON_ZEICHEN.test(t)) return false;
-          if (ziffern(t) < 7) return false;
-          var m = t.match(NUMMER);
-          if (!m) return false;
-          var nummer = m[0].replace(/[\s.\-–]+$/, '').trim();
-          if (ziffern(nummer) < 7) return false;
-          f.telefon = nummer; ok = true; return true;
+        return x.spalten.some(function (s) {
+          return s.split(/\s+[·•|∙◦]\s+|\s{2,}|(?=\b(?:Tel|Fon|Phone|Telefon|Mobil|Mobile|Handy|Fax|T|M|F)\b\.?\s*:?\s*\+?\d)/i).some(function (t) {
+            if (FAX.test(t) || t.indexOf('@') >= 0 || istAnschrift(t) && !TELEFON_ZEICHEN.test(t)) return false;
+            if (ziffern(t) < 7) return false;
+            var m = t.match(NUMMER);
+            if (!m) return false;
+            var nummer = m[0].replace(/[\s.\-–]+$/, '').trim();
+            if (ziffern(nummer) < 7) return false;
+            f.telefon = nummer; return true;
+          });
         });
-        return ok;
       });
       z.some(function (x) {
-        var t = x.zeile;
-        if (istAusschluss(t) || RECHTSFORM.test(t) || !POSITION.test(t)) return false;
-        if (/^(department|abteilung)\b/i.test(t) && x.teile.length === 1 && !/(head|leit)/i.test(t)) return false;
-        f.position = aufraeumen(t); return true;
+        return x.spalten.some(function (t) {
+          if (istAusschluss(t) || RECHTSFORM.test(t) || !POSITION.test(t)) return false;
+          if (/^(department|abteilung)\b/i.test(t) && !/[·•|]/.test(t) && !/(head|leit)/i.test(t)) return false;
+          f.position = aufraeumen(t); return true;
+        });
       });
     }
     f.punkte = (f.email ? 3 : 0) + (f.nachname ? 1 : 0) + (f.einrichtung ? 1 : 0);
     return f;
   }
-  var GROESSTE_SEITE = 1800;
+  function kastenAbstand(a, b) {
+    var dx = Math.max(b.x0 - a.x1, a.x0 - b.x1), dy = Math.max(b.y0 - a.y1, a.y0 - b.y1);
+    return Math.max(dx, dy);
+  }
+  function textAusTsv(tsv) {
+    var zeilen = {}, folge = [];
+    String(tsv || '').split('\n').forEach(function (r) {
+      var s = r.split('\t');
+      if (s.length < 12 || s[0] !== '5') return;
+      var t = s.slice(11).join(' ').trim();
+      if (!t) return;
+      var k = s[2] + '.' + s[3] + '.' + s[4];
+      if (!zeilen[k]) { zeilen[k] = []; folge.push(k); }
+      zeilen[k].push({ x0: +s[6], y0: +s[7], x1: +s[6] + +s[8], y1: +s[7] + +s[9], t: t });
+    });
+    var linien = folge.map(function (k) {
+      var w = zeilen[k];
+      var hs = w.filter(function (x) { return /[A-Za-z0-9ÄÖÜäöüß]{2,}/.test(x.t); }).map(function (x) { return Math.min(x.x1 - x.x0, x.y1 - x.y0); });
+      if (!hs.length) hs = w.map(function (x) { return Math.min(x.x1 - x.x0, x.y1 - x.y0); });
+      hs.sort(function (a, b) { return a - b; });
+      var hm = Math.max(1, hs[Math.floor(hs.length / 2)]), segs = [], akt = null;
+      w.forEach(function (x) {
+        if (!akt || kastenAbstand(akt.letztes, x) > 1.8 * hm) { akt = { x0: x.x0, y0: x.y0, x1: x.x1, y1: x.y1, w: [] }; segs.push(akt); }
+        akt.w.push(x.t); akt.letztes = x;
+        akt.x0 = Math.min(akt.x0, x.x0); akt.y0 = Math.min(akt.y0, x.y0); akt.x1 = Math.max(akt.x1, x.x1); akt.y1 = Math.max(akt.y1, x.y1);
+      });
+      segs.forEach(function (s) { s.text = symbolWeg(s.w.join(' ')); });
+      return { segs: segs, hm: hm };
+    });
+    linien.forEach(function (L, i) {
+      L.segs.forEach(function (s) {
+        if (!s.text || !nurRechtsform(s.text)) return;
+        for (var j = i - 1; j >= 0 && j >= i - 3; j--) {
+          var oben = linien[j].segs.filter(function (o) {
+            return o.text && kastenAbstand(o, s) < 1.5 * L.hm && !nurRechtsform(o.text) && !/\d|@/.test(o.text);
+          })[0];
+          if (oben) { oben.text += ' ' + s.text; s.text = ''; return; }
+        }
+      });
+    });
+    return linien.map(function (L) { return L.segs.filter(function (s) { return s.text; }).map(function (s) { return s.text; }).join(SPALTE); })
+      .filter(Boolean).join('\n');
+  }
+  var GROESSTE_SEITE = 2600, KLEINSTE_SEITE = 2000;
   function leinwand(b, h) { var c = document.createElement('canvas'); c.width = b; c.height = h; return c; }
   function grau(c) {
     var ctx = c.getContext('2d', { willReadFrequently: true }), d = ctx.getImageData(0, 0, c.width, c.height), p = d.data;
@@ -155,7 +254,8 @@
   }
   function zeichnen(quelle, qb, qh, ausschnitt) {
     var a = ausschnitt || { x: 0, y: 0, b: qb, h: qh };
-    var m = Math.min(1, GROESSTE_SEITE / Math.max(a.b, a.h));
+    var g = Math.max(a.b, a.h), m = Math.min(1, GROESSTE_SEITE / g);
+    if (g < KLEINSTE_SEITE) m = Math.min(2, KLEINSTE_SEITE / g);
     var c = leinwand(Math.round(a.b * m), Math.round(a.h * m));
     c.getContext('2d').drawImage(quelle, a.x, a.y, a.b, a.h, 0, 0, c.width, c.height);
     return grau(c);
@@ -193,14 +293,19 @@
     if (rahmen) {
       var ev = video.getBoundingClientRect(), er = rahmen.getBoundingClientRect();
       var m = Math.max(ev.width / vw, ev.height / vh);
-      var ox = (ev.width - vw * m) / 2, oy = (ev.height - vh * m) / 2;
-      var rand = 0.2;
-      var x = (er.left - ev.left - ox) / m, y = (er.top - ev.top - oy) / m, b = er.width / m, h = er.height / m;
-      x -= b * rand; y -= h * rand; b *= 1 + 2 * rand; h *= 1 + 2 * rand;
-      x = Math.max(0, x); y = Math.max(0, y); b = Math.min(vw - x, b); h = Math.min(vh - y, h);
-      a = { x: x, y: y, b: b, h: h };
+      var oy = (ev.height - vh * m) / 2;
+      var rand = ev.height > ev.width ? 0.5 : 0.2;
+      var y = (er.top - ev.top - oy) / m, h = er.height / m;
+      y -= h * rand; h *= 1 + 2 * rand;
+      y = Math.max(0, y); h = Math.min(vh - y, h);
+      a = { x: 0, y: y, b: vw, h: h };
     }
     return zeichnen(video, vw, vh, a);
+  }
+  function inAppBrowser(ua) {
+    ua = String(ua || '');
+    if (!/Android/i.test(ua)) return false;
+    return /;\s*wv\)/.test(ua) || /(FBAN|FBAV|FB_IAB|Instagram|WhatsApp|LinkedInApp|BytedanceWebview|musical_ly|\bLine\/)/.test(ua);
   }
   var programmLaden = null, arbeiterV = null, arbeiter = null;
   function programm() {
@@ -242,7 +347,7 @@
   function erkennen(bild, optionen) {
     var o = optionen || {}, start = Date.now();
     var limit = (o.zeitlimitSekunden || einst().zeitlimitSekunden || 30) * 1000;
-    var mitTelPos = !!o.mitTelPos, versuche = 0, abgelaufen = false;
+    var mitTelPos = !!o.mitTelPos, versuche = 0, abgelaufen = false, roh = null;
     var meinV = vorwaermen();
     function meinenBeenden() {
       if (arbeiterV === meinV) { arbeiterV = null; arbeiter = null; }
@@ -254,11 +359,14 @@
         if (i >= drehungen.length || abgelaufen || (i > 0 && Date.now() - start > limit * 0.6)) return bestes;
         var c = i === 0 ? bild : drehen(bild, drehungen[i]);
         versuche++;
-        return w.recognize(c, {}, { text: true }).then(function (r) {
-          var text = r && r.data ? r.data.text : '';
+        return w.recognize(c, {}, { text: true, tsv: true }).then(function (r) {
+          var text = r && r.data ? r.data.text : '', tsv = r && r.data ? r.data.tsv : '';
           r = null;
-          var f = auswerten(text, mitTelPos);
-          text = null;
+          var spaltenText = tsv ? textAusTsv(tsv) : '';
+          var f = auswerten(spaltenText || text, mitTelPos);
+          if (spaltenText && !f.email) { var f2 = auswerten(text, mitTelPos); if (f2.email) { f = f2; spaltenText = ''; } }
+          if (o.rohtext) roh = spaltenText || text;
+          text = null; tsv = null; spaltenText = null;
           if (i > 0) verwerfen(c);
           if (!bestes || f.punkte > bestes.punkte) bestes = f;
           if (f.email || f.punkte >= 3) return bestes;
@@ -271,7 +379,10 @@
     var wache = new Promise(function (ok, fehler) { uhr = setTimeout(function () { abgelaufen = true; fehler(new Error('zeitlimit')); }, limit); });
     return Promise.race([arbeit, wache]).then(function (f) {
       clearTimeout(uhr); verwerfen(bild); meinenBeenden();
-      return { felder: f || auswerten('', mitTelPos), dauerMs: Date.now() - start, versuche: versuche };
+      var erg = { felder: f || auswerten('', mitTelPos), dauerMs: Date.now() - start, versuche: versuche };
+      if (o.rohtext) erg.roh = roh;
+      roh = null;
+      return erg;
     }, function (e) {
       clearTimeout(uhr); verwerfen(bild); meinenBeenden();
       throw new Error(e && e.message === 'zeitlimit' ? 'zeitlimit' : 'fehler');
@@ -279,9 +390,9 @@
   }
   window.Visitenkarte = {
     PFAD: PFAD, DATEIEN: DATEIEN,
-    auswerten: auswerten,
+    auswerten: auswerten, textAusTsv: textAusTsv,
     kameraMoeglich: kameraMoeglich, kameraOeffnen: kameraOeffnen, kameraSchliessen: kameraSchliessen,
-    ausVideo: ausVideo, ausDatei: ausDatei,
+    ausVideo: ausVideo, ausDatei: ausDatei, inAppBrowser: inAppBrowser,
     vorwaermen: vorwaermen, erkennen: erkennen, beenden: beenden,
     _verwerfen: verwerfen
   };

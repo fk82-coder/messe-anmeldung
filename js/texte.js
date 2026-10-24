@@ -113,6 +113,7 @@
       vkSchlecht: 'Die Karte war nicht gut lesbar. Bitte tippen Sie Ihre Angaben selbst ein.',
       vkKeineKamera: 'Die Kamera ist gerade nicht verfügbar. Bitte tippen Sie Ihre Angaben selbst ein.',
       vkNochmal: 'Bitte tippen Sie noch einmal auf „Eigene Visitenkarte lesen lassen“. Dann öffnet sich die Kamera des Tablets.',
+      vkImBrowser: 'Die Kamera lässt sich hier nicht öffnen. Bitte öffnen Sie die Seite im Browser: oben rechts auf die drei Punkte ⋮ tippen, dann „In Chrome öffnen“. Oder tippen Sie Ihre Angaben selbst ein.',
       telefonLabel: 'Telefon (freiwillig, nur für den Vertrieb)',
       positionLabel: 'Position (freiwillig, nur für den Vertrieb)'
     },
@@ -181,6 +182,7 @@
       vkSchlecht: 'The card could not be read well. Please type in your details yourself.',
       vkKeineKamera: 'The camera is not available right now. Please type in your details yourself.',
       vkNochmal: 'Please tap “Read my business card” once more. The tablet’s camera will then open.',
+      vkImBrowser: 'The camera cannot be opened here. Please open the page in your browser: tap the three dots ⋮ at the top right, then “Open in Chrome”. Or type in your details yourself.',
       telefonLabel: 'Telephone (optional, sales team only)',
       positionLabel: 'Position (optional, sales team only)'
     },
@@ -233,6 +235,7 @@
       vkSchlecht: 'La tarjeta no se ha podido leer bien. Introduzca sus datos usted mismo.',
       vkKeineKamera: 'La cámara no está disponible en este momento. Introduzca sus datos usted mismo.',
       vkNochmal: 'Toque una vez más «Leer mi tarjeta de visita». Entonces se abrirá la cámara de la tableta.',
+      vkImBrowser: 'La cámara no se puede abrir aquí. Abra la página en el navegador: toque los tres puntos ⋮ arriba a la derecha y luego «Abrir en Chrome». O introduzca sus datos usted mismo.',
       telefonLabel: 'Teléfono (opcional, solo para el equipo de ventas)', positionLabel: 'Cargo (opcional, solo para el equipo de ventas)'
     },
     fr: {
@@ -284,6 +287,7 @@
       vkSchlecht: 'La carte n’a pas pu être bien lue. Veuillez saisir vos coordonnées vous-même.',
       vkKeineKamera: 'La caméra n’est pas disponible pour le moment. Veuillez saisir vos coordonnées vous-même.',
       vkNochmal: 'Veuillez toucher encore une fois « Lire ma carte de visite ». La caméra de la tablette s’ouvrira alors.',
+      vkImBrowser: 'La caméra ne peut pas s’ouvrir ici. Veuillez ouvrir la page dans le navigateur : touchez les trois points ⋮ en haut à droite, puis « Ouvrir dans Chrome ». Ou saisissez vos coordonnées vous-même.',
       telefonLabel: 'Téléphone (facultatif, uniquement pour le service commercial)', positionLabel: 'Fonction (facultatif, uniquement pour le service commercial)'
     },
     it: {
@@ -335,6 +339,7 @@
       vkSchlecht: 'Non è stato possibile leggere bene il biglietto. Inserisca i suoi dati da sé.',
       vkKeineKamera: 'La fotocamera non è disponibile al momento. Inserisca i suoi dati da sé.',
       vkNochmal: 'Tocchi ancora una volta «Leggi il mio biglietto da visita». Si aprirà la fotocamera del tablet.',
+      vkImBrowser: 'Qui non è possibile aprire la fotocamera. Apra la pagina nel browser: tocchi i tre puntini ⋮ in alto a destra, poi «Apri in Chrome». Oppure inserisca i suoi dati da sé.',
       telefonLabel: 'Telefono (facoltativo, solo per l’ufficio vendite)', positionLabel: 'Posizione (facoltativo, solo per l’ufficio vendite)'
     },
     nl: {
@@ -386,6 +391,7 @@
       vkSchlecht: 'Het kaartje kon niet goed worden gelezen. Vul uw gegevens zelf in.',
       vkKeineKamera: 'De camera is op dit moment niet beschikbaar. Vul uw gegevens zelf in.',
       vkNochmal: 'Tik nog een keer op „Mijn visitekaartje laten lezen”. Dan opent de camera van de tablet.',
+      vkImBrowser: 'De camera kan hier niet worden geopend. Open de pagina in de browser: tik rechtsboven op de drie puntjes ⋮ en dan op „Openen in Chrome”. Of vul uw gegevens zelf in.',
       telefonLabel: 'Telefoon (optioneel, alleen voor de verkoopafdeling)', positionLabel: 'Functie (optioneel, alleen voor de verkoopafdeling)'
     }
   };
