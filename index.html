@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="color-scheme" content="only light">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="strict-origin">
+<meta name="theme-color" content="#2D4B9B">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https:; form-action 'self' https:; frame-src 'self' https:; manifest-src 'self'">
+<title>Süsse Newsletter – Messe-App</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="bilder/symbol-192.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<section class="seite" id="start">
+  <div class="testhinweis" id="testHinweis" role="note" data-t="testHinweis"></div>
+  <header class="kopf kopf-start">
+    <img class="logo" src="bilder/logo.png" alt="Süsse Labortechnik">
+    <div class="kopf-sprachen">
+      <div class="flaggen gross" data-flaggen></div>
+      <p class="tipp" data-t="tipp"></p>
+    </div>
+  </header>
+  <main class="inhalt start-inhalt">
+    <div class="start-links">
+      <h1 data-t="titel"></h1>
+      <p class="untertitel" data-t="untertitel"></p>
+      <button class="knopf knopf-blau knopf-los" id="los" data-t="los"></button>
+      <p class="klein" data-t="losText"></p>
+      <div class="vorteile"><span data-t="v1"></span><span data-t="v2"></span><span data-t="v3"></span></div>
+    </div>
+    <div class="start-rechts">
+      <div class="karte">
+        <div class="eyebrow" data-t="ewNl"></div>
+        <ul class="nl-liste"><li data-t="nl1"></li><li data-t="nl2"></li><li data-t="nl3"></li><li data-t="nl4"></li></ul>
+        <p class="klein" data-t="nlHinweis"></p>
+      </div>
+    </div>
+  </main>
+</section>
+<section class="seite" id="formular">
+  <header class="kopf">
+    <img class="logo klein" src="bilder/logo.png" alt="Süsse Labortechnik">
+    <div class="kopf-mitte"></div>
+    <div class="flaggen klein" data-flaggen></div>
+    <button class="knopf-rand" data-aktion="neu" data-t="abbrechen"></button>
+  </header>
+  <main class="inhalt formular-inhalt">
+    <div class="spalte-angaben">
+      <h2 data-t="angabenTitel"></h2>
+      <p class="klein" data-t="pflichtHinweis"></p>
+      <div class="vk" id="vkBox">
+        <button type="button" class="vk-knopf" id="vkKnopf"><svg class="vk-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-2.5h6L17 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><circle cx="12" cy="13.2" r="3.9" fill="none" stroke="currentColor" stroke-width="1.9"/></svg><span data-t="vkKnopf"></span></button>
+        <p class="vk-hinweis" data-t="vkHinweis"></p>
+        <p class="vk-meldung" id="vkMeldung" role="status"></p>
+        <input type="file" id="vkDatei" accept="image/*" capture="environment" tabindex="-1" aria-hidden="true">
+      </div>
+      <div class="feld">
+        <label for="f_email"><span data-t="email"></span> <span class="pflicht">*</span></label>
+        <input type="email" id="f_email" inputmode="email" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="name@example.com">
+        <span class="fehlertext" id="emailFehler" data-t="emailFalsch"></span>
+      </div>
+      <div class="feld">
+        <span class="lbl"><span data-t="anrede"></span> <span class="frei" data-t="frei"></span></span>
+        <div class="chips" data-gruppe="anrede">
+          <button class="chip" data-wert="frau" data-t="frau"></button><button class="chip" data-wert="herr" data-t="herr"></button><button class="chip" data-wert="divers" data-t="divers"></button><button class="chip" data-wert="keine" data-t="keine"></button>
+        </div>
+      </div>
+      <div class="zwei">
+        <div class="feld">
+          <label for="f_vorname"><span data-t="vorname"></span> <span class="frei" data-t="frei"></span></label>
+          <input type="text" id="f_vorname" autocomplete="off" autocorrect="off" spellcheck="false">
+        </div>
+        <div class="feld">
+          <label for="f_nachname"><span data-t="nachname"></span> <span class="frei" data-t="frei"></span></label>
+          <input type="text" id="f_nachname" autocomplete="off" autocorrect="off" spellcheck="false">
+        </div>
+      </div>
+      <div class="feld">
+        <label for="f_einrichtung"><span data-t="einrichtung"></span> <span class="frei" data-t="frei"></span></label>
+        <input type="text" id="f_einrichtung" autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
+      <div class="mehr" id="mehr">
+        <h3 class="mehr-titel"><span data-t="mehrTitel"></span> <span class="frei" data-t="frei"></span></h3>
+        <p class="mehr-zweck" data-t="mehrZweck"></p>
+        <div class="feld">
+          <span class="lbl"><span data-t="bereich"></span> <span class="frei"><span data-t="mehrere"></span> <span data-t="frei"></span></span></span>
+          <div class="chips mehrfach" data-gruppe="bereich">
+            <button class="chip" data-wert="klinik" data-t="b_klinik"></button><button class="chip" data-wert="medlabor" data-t="b_medlabor"></button><button class="chip" data-wert="pathologie" data-t="b_pathologie"></button><button class="chip" data-wert="tiermedizin" data-t="b_tiermedizin"></button><button class="chip" data-wert="forschung" data-t="b_forschung"></button><button class="chip" data-wert="industrie" data-t="b_industrie"></button><button class="chip" data-wert="behoerde" data-t="b_behoerde"></button><button class="chip" data-wert="handel" data-t="b_handel"></button><button class="chip" data-wert="sonstiges" data-t="b_sonstiges"></button>
+          </div>
+          <div class="feld bereich-sonst" id="bereichSonstBox">
+            <label for="f_bereich_sonst" data-t="bereichSonst"></label>
+            <input type="text" id="f_bereich_sonst" maxlength="60" autocomplete="off" autocorrect="off" spellcheck="false">
+          </div>
+        </div>
+        <div class="feld">
+          <span class="lbl"><span data-t="interessen"></span> <span class="frei"><span data-t="mehrere"></span> <span data-t="frei"></span></span></span>
+          <div class="chips mehrfach" data-gruppe="interessen">
+            <button class="chip" data-wert="versand" data-t="i_versand"></button><button class="chip" data-wert="gefaesse" data-t="i_gefaesse"></button><button class="chip" data-wert="sekundaer" data-t="i_sekundaer"></button><button class="chip" data-wert="patho" data-t="i_patho"></button><button class="chip" data-wert="labor" data-t="i_labor"></button>
+          </div>
+        </div>
+        <div class="feld">
+          <label for="f_land"><span data-t="land"></span> <span class="frei" data-t="frei"></span></label>
+          <select id="f_land" autocomplete="off"></select>
+        </div>
+      </div>
+      <p class="tasten" data-t="tasten"></p>
+    </div>
+    <div class="spalte-einwilligung">
+      <div class="einw-rollen">
+      <div class="karte">
+        <div class="eyebrow" data-t="ewEinw"></div>
+        <div class="entwurfmarke" id="rechtEntwurf"></div>
+        <label class="haken" for="f_haken">
+          <input type="checkbox" id="f_haken">
+          <span data-t="einwilligung"></span>
+        </label>
+        <p class="klein" data-t="nlSprache"></p>
+        <button class="link" data-aktion="datenschutz" data-t="dsLink"></button>
+      </div>
+      <div class="karte vertrieb" id="vertriebBox">
+        <div class="eyebrow"><span data-t="ewVertrieb"></span>&nbsp;<span class="frei" data-t="frei"></span></div>
+        <label class="haken" for="f_vertrieb">
+          <input type="checkbox" id="f_vertrieb">
+          <span data-t="vertriebText"></span>
+        </label>
+        <div class="telpos" id="telPos">
+          <div class="feld">
+            <label for="f_telefon" data-t="telefonLabel"></label>
+            <input type="tel" id="f_telefon" inputmode="tel" autocomplete="off" autocorrect="off" spellcheck="false">
+          </div>
+          <div class="feld">
+            <label for="f_position" data-t="positionLabel"></label>
+            <input type="text" id="f_position" autocomplete="off" autocorrect="off" spellcheck="false">
+          </div>
+        </div>
+      </div>
+      <div class="hinweis-offline" id="offlineVor" data-t="offlineVor"></div>
+      </div>
+      <div class="knopfleiste">
+        <button class="knopf knopf-braun" id="senden" disabled data-t="knopf"></button>
+        <p class="unter-knopf" data-t="unterKnopf"></p>
+      </div>
+    </div>
+  </main>
+</section>
+<section class="seite" id="sendet">
+  <main class="inhalt mitte">
+    <div class="ring"></div>
+    <h1 data-t="moment"></h1>
+    <p class="klein" data-t="uebertragen"></p>
+  </main>
+</section>
+<section class="seite" id="danke">
+  <header class="kopf">
+    <img class="logo klein" src="bilder/logo.png" alt="Süsse Labortechnik">
+    <div class="kopf-mitte"></div>
+  </header>
+  <main class="inhalt mitte">
+    <div class="haekchen">✓</div>
+    <h1 data-t="danke"></h1>
+    <div id="dankeOnline">
+      <p class="gross" data-t="danke1"></p>
+      <p class="gross" data-t="danke2"></p>
+      <p class="klein" data-t="spam"></p>
+    </div>
+    <p class="gross" id="dankeZwei" data-t="dankeZwei"></p>
+    <div id="dankeOffline">
+      <p class="gross" data-t="off1"></p>
+      <p class="gross" id="off2" data-t="off2"></p>
+      <p class="klein" data-t="off3"></p>
+    </div>
+    <div class="zaehler"><span data-t="geleert"></span> <b id="countdown">10</b> s</div>
+    <div class="testuebertragung" id="testUebertragung"></div>
+  </main>
+</section>
+<section class="seite" id="nichtEingerichtet">
+  <main class="inhalt mitte">
+    <h1>App nicht eingerichtet</h1>
+    <p class="gross">Für die Standardsprache fehlen Angaben in <b>js/konfiguration.js</b>:</p>
+    <p class="klein" id="fehltListe"></p>
+    <p class="klein">Anmeldungen sind so nicht möglich. Standteam: Herrn Krollpfeiffer Bescheid geben und bis dahin das Symbol <b>„Newsletter Plan B“</b> nutzen.</p>
+  </main>
+</section>
+<div class="ueber" id="datenschutz">
+  <div class="karte ueber-karte">
+    <h2 data-t="dsTitel"></h2>
+    <div class="ds-text" data-t="dsText"></div>
+    <button class="knopf knopf-blau" data-aktion="datenschutz-zu" data-t="schliessen"></button>
+  </div>
+</div>
+<div class="ueber vk-kamera" id="vkKamera">
+  <div class="vk-buehne">
+    <video id="vkVideo" playsinline muted></video>
+    <div class="vk-rahmen" id="vkRahmen"></div>
+    <p class="vk-anleitung" data-t="vkAnleitung"></p>
+  </div>
+  <div class="vk-leiste">
+    <button type="button" class="knopf vk-zurueck" data-aktion="vk-abbrechen" data-t="abbrechen"></button>
+    <button type="button" class="knopf knopf-blau vk-ausloeser" id="vkAusloeser" disabled data-t="vkFoto"></button>
+  </div>
+</div>
+<div class="ueber" id="vkLesen">
+  <div class="karte ueber-karte vk-lesen-karte">
+    <div class="ring"></div>
+    <h2 data-t="vkLiest"></h2>
+    <p class="klein" data-t="vkLiestText"></p>
+    <button type="button" class="knopf-rand" data-aktion="vk-abbrechen" data-t="abbrechen"></button>
+  </div>
+</div>
+<footer class="fuss" id="fuss">
+  <span id="wartend" class="wartend"></span>
+  <span id="testleiste" class="testleiste"></span>
+  <span id="warnung" class="warnung"></span>
+  <span class="fuss-rechts">Anbieter: Süsse Labortechnik GmbH &amp; Co. KG · Impressum: www.suesse.de/impressum · Messe-App <b id="version"></b> · <span data-t="nichts"></span></span>
+</footer>
+<script src="js/konfiguration.js"></script>
+<script src="js/texte.js"></script>
+<script src="js/laender.js"></script>
+<script src="js/speicher.js"></script>
+<script src="js/versand.js"></script>
+<script src="js/visitenkarte.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
