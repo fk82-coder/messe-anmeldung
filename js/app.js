@@ -21,7 +21,7 @@
       box.innerHTML = SPRACHEN.map(function (l) {
         var unfertig = V.sprachePruefen(l).length > 0;
         return '<button class="fl" data-l="' + l + '" aria-label="' + T[l].sprachname + '">' + flaggeSvg(l) +
-          '<span>' + T[l].sprachname + '</span>' + (unfertig ? '<span class="flmarke">Entwurf</span>' : '') + '</button>';
+          (unfertig ? '<span class="flmarke">Entwurf</span>' : '') + '</button>';
       }).join('');
     });
   }
