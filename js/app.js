@@ -402,7 +402,7 @@
     l.innerHTML = '<span>TESTMODUS<span class="tl-lang"> – nichts geht an CleverReach</span></span> ' +
       '<button id="tNetz" class="' + (V.Testnetz.an ? '' : 'aus') + '">Netz (gespielt): ' + (V.Testnetz.an ? 'an' : 'AUS') + '</button>' +
       '<button id="tSenden">Jetzt nachsenden</button>' +
-      '<span>Bildschirm ' + window.innerWidth + '×' + window.innerHeight + ' · Pixel ×' + (window.devicePixelRatio || 1) + '</span>';
+      '<span class="tl-mass">Bildschirm ' + window.innerWidth + '×' + window.innerHeight + ' · Pixel ×' + (window.devicePixelRatio || 1) + '</span>';
     $('tNetz').onclick = function () { V.Testnetz.an = !V.Testnetz.an; netzPruefen(); if (V.Testnetz.an) nachsenden(); };
     $('tSenden').onclick = function () { V.nachsenden().then(zaehlerZeigen); };
   }
@@ -434,6 +434,7 @@
   }
   function starten() {
     $('version').textContent = 'v' + K.version + (K.testmodus ? ' TEST' : '');
+    $('versionHandy').textContent = $('version').textContent;
     $('testHinweis').classList.toggle('an', !!K.testmodus);
     if (!K.testmodus && V.sprachePruefen(K.standardSprache).length) { nichtEingerichtetZeigen(); return; }
     flaggenBauen();

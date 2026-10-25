@@ -115,6 +115,7 @@ mark { background: #FFE08A; color: #4a3500; padding: 0 .2em; border-radius: 3px;
 .fuss { flex: 0 0 auto; display: flex; align-items: center; gap: 1em; padding: .4em 1.4em; font-size: .62em; color: var(--grau); background: #F3F4F6; border-top: 1px solid var(--linie); }
 .fuss b { color: var(--blau); }
 .fuss-rechts { margin-left: auto; text-align: right; }
+.fuss-ver-handy { display: none; }
 .wartend { color: var(--kupfertext); font-weight: 700; }
 .testleiste { display: none; align-items: center; gap: .6em; background: #FFE08A; color: #3a2c00; padding: .25em .6em; border-radius: 4px; font-weight: 700; flex-wrap: wrap; }
 .testleiste.an { display: flex; }
@@ -191,10 +192,13 @@ input[type=tel].vorschlag { background: #DCEBFD; border-color: #5B8FD6; }
   .knopf-rand { min-height: 44px; padding: .3em .7em; }
   .vk-knopf { font-size: .88em; padding: .35em .6em; gap: .45em; }
   #fuss { flex-wrap: wrap; row-gap: .15em; gap: .5em; padding: .2em .7em; font-size: .55em; white-space: nowrap; overflow: hidden; }
+  #fuss .fuss-ver-handy { display: block; flex: 1 1 100%; min-width: 0; font-size: 1.25em; overflow: hidden; text-overflow: ellipsis; }
   #fuss .fuss-rechts { flex: 1 1 100%; margin-left: 0; text-align: left; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .testleiste.an { flex: 1 1 100%; flex-wrap: nowrap; gap: .35em; padding: .1em .35em; white-space: nowrap; overflow: hidden; min-width: 0; }
   .testleiste button { padding: .15em .45em; flex: 0 0 auto; }
-  .tl-lang { display: none; }
+  .tl-lang, .tl-mass { display: none; }
+  #start { overflow-y: auto; overscroll-behavior: contain; }
+  #start .start-inhalt { flex: 0 0 auto; overflow: visible; }
 }
 @media (max-width: 380px) { .zwei { flex-direction: column; gap: .55em; } }
 @media (max-height: 500px) {
@@ -205,6 +209,7 @@ input[type=tel].vorschlag { background: #DCEBFD; border-color: #5B8FD6; }
   .knopfleiste { position: static; box-shadow: none; padding: .5em 0 .8em; }
   #fuss { flex-wrap: nowrap; gap: .5em; padding: .15em .7em; font-size: .52em; white-space: nowrap; overflow: hidden; }
   #fuss .fuss-rechts { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  #fuss .fuss-ver-handy { flex: 0 0 auto; }
   .testleiste { flex-wrap: nowrap; gap: .35em; padding: .05em .35em; white-space: nowrap; }
   .testleiste button { padding: .1em .45em; }
 }
