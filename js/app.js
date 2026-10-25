@@ -382,7 +382,7 @@
     return S.anzahl().then(function (n) {
       $('wartend').textContent = n > 0 ? ('Standteam: ' + n + (n === 1 ? ' Anmeldung wartet' : ' Anmeldungen warten')) : '';
       var w = V.warnung();
-      $('warnung').textContent = w ? ('Technik: Rückmeldung enthält ' + w + ' – Herrn Krollpfeiffer informieren') : '';
+      $('warnung').textContent = w ? ('Technik: Rückmeldung enthält ' + w + ' – bitte Technik informieren') : '';
       $('warnung').classList.toggle('an', !!w);
       return n;
     });
@@ -427,14 +427,15 @@
     if (!('wakeLock' in navigator) || document.hidden) return;
     navigator.wakeLock.request('screen').then(function (s) { sperre = s; }).catch(function () {});
   }
+  function nichtEingerichtetZeigen() {
+    $('fehltListe').textContent = V.sprachePruefen(K.standardSprache).join(', ') || '–';
+    document.querySelectorAll('#fuss [data-t="nichts"]').forEach(function (e) { e.innerHTML = text('nichts'); });
+    document.querySelectorAll('.seite').forEach(function (s) { s.classList.toggle('aktiv', s.id === 'nichtEingerichtet'); });
+  }
   function starten() {
     $('version').textContent = 'v' + K.version + (K.testmodus ? ' TEST' : '');
     $('testHinweis').classList.toggle('an', !!K.testmodus);
-    if (!K.testmodus && V.sprachePruefen(K.standardSprache).length) {
-      $('fehltListe').textContent = V.sprachePruefen(K.standardSprache).join(', ');
-      document.querySelectorAll('.seite').forEach(function (s) { s.classList.toggle('aktiv', s.id === 'nichtEingerichtet'); });
-      return;
-    }
+    if (!K.testmodus && V.sprachePruefen(K.standardSprache).length) { nichtEingerichtetZeigen(); return; }
     flaggenBauen();
     setzeSprache(K.standardSprache);
     testleisteZeigen();
@@ -455,6 +456,7 @@
     var q = {};
     location.hash.replace(/^#/, '').split('&').forEach(function (p) { var a = p.split('='); if (a[0]) q[a[0]] = decodeURIComponent(a[1] || '1'); });
     if (!K.testmodus) { zeige('start'); return; }
+    if (q.s === 'nichteingerichtet') { nichtEingerichtetZeigen(); return; }
     if (q.netz === 'aus') V.Testnetz.an = false;
     if (q.lang) setzeSprache(q.lang);
     if (q.demo) {

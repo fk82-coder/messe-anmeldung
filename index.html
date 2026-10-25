@@ -20,7 +20,6 @@
     <img class="logo" src="bilder/logo.png" alt="Süsse Labortechnik">
     <div class="kopf-sprachen">
       <div class="flaggen gross" data-flaggen></div>
-      <p class="tipp" data-t="tipp"></p>
     </div>
   </header>
   <main class="inhalt start-inhalt">
@@ -28,7 +27,6 @@
       <h1 data-t="titel"></h1>
       <p class="untertitel" data-t="untertitel"></p>
       <button class="knopf knopf-blau knopf-los" id="los" data-t="los"></button>
-      <p class="klein" data-t="losText"></p>
       <div class="vorteile"><span data-t="v1"></span><span data-t="v2"></span><span data-t="v3"></span></div>
     </div>
     <div class="start-rechts">
@@ -177,11 +175,10 @@
   </main>
 </section>
 <section class="seite" id="nichtEingerichtet">
-  <main class="inhalt mitte">
-    <h1>App nicht eingerichtet</h1>
-    <p class="gross">Für die Standardsprache fehlen Angaben in <b>js/konfiguration.js</b>:</p>
-    <p class="klein" id="fehltListe"></p>
-    <p class="klein">Anmeldungen sind so nicht möglich. Standteam: Herrn Krollpfeiffer Bescheid geben und bis dahin das Symbol <b>„Newsletter Plan B“</b> nutzen.</p>
+  <main class="inhalt mitte ne-inhalt">
+    <p class="ne-bitte" lang="de">Bitte wenden Sie sich an unser Team.</p>
+    <p class="ne-bitte" lang="en">Please ask our team for help.</p>
+    <p class="ne-team">Standteam: Plan B nutzen. · Es fehlt: <span id="fehltListe"></span></p>
   </main>
 </section>
 <div class="ueber" id="datenschutz">

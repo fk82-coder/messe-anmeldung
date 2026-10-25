@@ -1,5 +1,5 @@
 window.KONFIG = {
-  version: '0.3.7',
+  version: '0.3.8',
   testmodus: true,
   messe: 'DVG 2026',
   standardSprache: 'de',

@@ -54,7 +54,10 @@ p { margin: 0 0 .6em; line-height: 1.45; }
 .start-links { flex: 1.1; min-width: 0; }
 .start-rechts { flex: .9; min-width: 0; }
 .kopf-sprachen { display: flex; flex-direction: column; align-items: flex-end; gap: .3em; margin-left: auto; }
-.tipp { color: var(--kupfertext); font-weight: 700; font-size: .8em; text-align: right; margin: 0; }
+.ne-inhalt { position: relative; }
+.ne-bitte { color: var(--blau); font-size: 1.7em; font-weight: 700; line-height: 1.25; margin: 0 0 .35em; }
+.ne-bitte[lang="en"] { font-size: 1.4em; font-weight: 400; }
+.ne-team { position: absolute; left: 0; right: 0; bottom: .8em; font-size: .6em; color: #9AA0A6; margin: 0; }
 .untertitel { color: var(--grau); font-size: 1em; }
 .knopf-los { margin: .7em 0 .5em; font-size: 1.35em; padding: .7em 1.6em; }
 .vorteile { display: flex; flex-wrap: wrap; gap: .4em 1.4em; font-size: .78em; color: var(--grau); margin-top: 1.1em; }
