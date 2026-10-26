@@ -97,6 +97,19 @@
   function pinVergessen() {
     return allesLoeschen().then(function () { try { localStorage.removeItem(pinSchluessel()); } catch (e) { } });
   }
+  function namenSchluessel() { return 'messe-app-standteam-' + modus(); }
+  function standteamVorgabe() { return (G.standteam || []).slice(); }
+  function standteamEigen() {
+    var l = []; try { l = JSON.parse(localStorage.getItem(namenSchluessel()) || '[]'); } catch (e) { l = []; }
+    if (!Array.isArray(l)) l = [];
+    return standteamVorgabe().map(function (n, i) { return einzeilig(l[i], G.standteamNameHoechstens || 40); });
+  }
+  function standteamNamen() { var eigen = standteamEigen(); return standteamVorgabe().map(function (n, i) { return eigen[i] || n; }); }
+  function standteamSpeichern(liste) {
+    var l = standteamVorgabe().map(function (n, i) { return einzeilig((liste || [])[i], G.standteamNameHoechstens || 40); });
+    try { if (l.some(Boolean)) localStorage.setItem(namenSchluessel(), JSON.stringify(l)); else localStorage.removeItem(namenSchluessel()); } catch (e) { }
+    return standteamNamen();
+  }
   function datenBauen(e, erfasstMs, nr) {
     var naechster = (e.naechster || []).filter(function (k) { return W.naechster[k]; });
     var mitMuster = naechster.indexOf('muster') >= 0, mitAngebot = naechster.indexOf('angebot') >= 0;
@@ -206,14 +219,15 @@
     datenBauen: datenBauen, fehlendePflicht: fehlendePflicht, anmeldungBauen: anmeldungBauen, csvBauen: csvBauen, SPALTEN: SPALTEN,
     dateiname: dateiname, betreff: betreff, ablegen: ablegen, uebergeben: uebergeben, AUSGAENGE: AUSGAENGE, pinOk: pinOk, liste: liste, anzahl: anzahl, aeltestes: aeltestes, loeschen: loeschen,
     pinGesetzt: pinGesetzt, pinFestlegen: pinFestlegen, pinPruefen: pinPruefen, pinVergessen: pinVergessen, naechsteNr: naechsteNr,
+    standteamNamen: standteamNamen, standteamEigen: standteamEigen, standteamSpeichern: standteamSpeichern, _namenSchluessel: namenSchluessel,
     leeren: function () { }, seiteAktiv: function () { return false; }, spracheGeaendert: function () { },
     _roh: rohListe, _allesLoeschen: allesLoeschen, _dbName: function () { return db().then(function () { return dbName; }); }
   };
   window.Gespraech = API;
   if (!$('gespraech') || !A) return;
-  var SEITEN = ['gPinNeu', 'gespraech', 'gUebergabe', 'gDanke', 'gExport'];
+  var SEITEN = ['gPinNeu', 'gespraech', 'gUebergabe', 'gDanke', 'gExport', 'gNamen'];
   function seiteAktiv() { var s = document.querySelector('.seite.aktiv'); return !!s && SEITEN.indexOf(s.id) >= 0; }
-  var schritt = 1, sendetGerade = false, dankeUhr = null, pinZweck = null, exportIds = [];
+  var schritt = 1, sendetGerade = false, dankeUhr = null, pinZweck = null, exportIds = [], nachPinNeu = 'gespraech';
   var VKZ = {
     felder: { email: 'g_email', vorname: 'g_vorname', nachname: 'g_nachname', einrichtung: 'g_einrichtung', telefon: 'g_telefon', position: 'g_position' },
     meldung: 'gVkMeldung', email: 'g_email', emailHinweis: 'gEmailPruefen', anleitung: tx('vkAnleitung'),
@@ -243,8 +257,8 @@
     g2.appendChild(opt(window.Laender.ANDERES, T.de.landAnderes));
     sel.appendChild(g1); sel.appendChild(g2);
   }
-  function vonNamen() { var o = {}; (G.standteam || []).forEach(function (n, i) { o[String(i)] = n; }); return o; }
-  function vonName() { var i = chipWert('gVon'); return i === '' ? '' : ((G.standteam || [])[+i] || ''); }
+  function vonNamen() { var o = {}; standteamNamen().forEach(function (n, i) { o[String(i)] = n; }); return o; }
+  function vonName() { var i = chipWert('gVon'); return i === '' ? '' : (standteamNamen()[+i] || ''); }
   function eingabe() {
     var mitEmail = emailOk($('g_email').value);
     return {
@@ -278,6 +292,7 @@
   }
   function startZeigen() {
     $('gStart').classList.toggle('an', nutzbar());
+    $('start').classList.toggle('mit-gespraech', nutzbar());
     return Promise.all([anzahl(), aeltestes()]).then(function (r) {
       var n = r[0] || 0, alt = n && (Date.now() - r[1]) > (G.warnenNachStunden || 72) * 3600 * 1000;
       $('gStartZaehler').textContent = n + ' ' + (n === 1 ? tx('gespeichertEins') : tx('gespeichertMehr'));
@@ -296,7 +311,8 @@
     $('g_haken').checked = false; $('g_vertrieb').checked = false;
     ['g_pin1', 'g_pin2', 'g_pin_frage'].forEach(function (i) { $(i).value = ''; });
     $('gPinFrage').classList.remove('an'); pinZweck = null;
-    ['gVkMeldung', 'gPinMeldung', 'gPinFrageMeldung', 'gExportMeldung'].forEach(function (i) { $(i).textContent = ''; $(i).classList.remove('an'); });
+    ['gVkMeldung', 'gPinMeldung', 'gPinFrageMeldung', 'gExportMeldung', 'gNamenMeldung'].forEach(function (i) { $(i).textContent = ''; $(i).classList.remove('an'); });
+    document.querySelectorAll('#gNamenFelder input').forEach(function (el) { el.value = ''; });
     A.emailMarkeWeg(VKZ);
     $('gZeichen').textContent = '0';
     $('gTestUebertragung').innerHTML = ''; $('gTestUebertragung').classList.remove('an');
@@ -306,21 +322,51 @@
     startZeigen();
   }
   function meldung(id, t, warn) { var m = $(id); m.textContent = t || ''; m.classList.toggle('an', !!t); m.classList.toggle('warn', !!warn); }
+  function pinNeuZeigen(danach) {
+    nachPinNeu = danach; meldung('gPinMeldung', ''); A.zeige('gPinNeu'); setTimeout(function () { $('g_pin1').focus(); }, 60);
+  }
   function losGehen() {
     if (!nutzbar()) return;
-    if (!pinGesetzt()) { meldung('gPinMeldung', ''); A.zeige('gPinNeu'); setTimeout(function () { $('g_pin1').focus(); }, 60); return; }
+    if (!pinGesetzt()) { pinNeuZeigen('gespraech'); return; }
     gespraechStarten();
   }
   function pinNeuSpeichern() {
     var p1 = $('g_pin1').value.trim(), p2 = $('g_pin2').value.trim();
     if (!pinOk(p1)) { meldung('gPinMeldung', tx('pinRegel'), true); return; }
     if (p1 !== p2) { meldung('gPinMeldung', tx('pinUngleich'), true); return; }
-    pinFestlegen(p1).then(function () { $('g_pin1').value = ''; $('g_pin2').value = ''; gespraechStarten(); });
+    pinFestlegen(p1).then(function () {
+      $('g_pin1').value = ''; $('g_pin2').value = '';
+      if (nachPinNeu === 'namen') namenZeigen(); else gespraechStarten();
+      nachPinNeu = 'gespraech';
+    });
+  }
+  function namenLos() {
+    if (!nutzbar()) return;
+    if (!pinGesetzt()) { pinNeuZeigen('namen'); return; }
+    pinFragen('namen');
+  }
+  function namenZeigen() {
+    var vor = standteamVorgabe(), eigen = standteamEigen(), max = G.standteamNameHoechstens || 40;
+    $('gNamenFelder').innerHTML = vor.map(function (n, i) {
+      return '<div class="feld"><label for="g_name' + i + '">' + esc(tx('namenFeld') + ' ' + (i + 1)) + '</label>' +
+        '<input type="text" id="g_name' + i + '" maxlength="' + max + '" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" placeholder="' + esc(n) + '"></div>';
+    }).join('');
+    eigen.forEach(function (n, i) { $('g_name' + i).value = n; });
+    meldung('gNamenMeldung', '');
+    A.zeige('gNamen');
+  }
+  function namenSpeichernKlick() {
+    var l = standteamVorgabe().map(function (n, i) { var el = $('g_name' + i); return el ? el.value : ''; });
+    var neu = standteamSpeichern(l);
+    standteamEigen().forEach(function (n, i) { var el = $('g_name' + i); if (el) el.value = n; });
+    chipsBauen('gVon', vonNamen());
+    meldung('gNamenMeldung', tx('namenGespeichert') + ' ' + neu.join(' · '));
   }
   function gespraechStarten() {
+    chipsBauen('gVon', vonNamen());
     leeren();
     var letzter = ''; try { letzter = localStorage.getItem('messe-app-gespraech-von') || ''; } catch (e) { }
-    if (letzter !== '' && (G.standteam || [])[+letzter]) chipSetzen('gVon', [letzter]);
+    if (letzter !== '' && standteamNamen()[+letzter]) chipSetzen('gVon', [letzter]);
     $('gVkBox').classList.toggle('an', !!A.vkAn());
     $('gTestzeile').classList.toggle('an', !!K.testmodus);
     A.zeige('gespraech');
@@ -369,7 +415,7 @@
   function spracheGeaendert() { if ($('gUebergabe').classList.contains('aktiv')) uebergabeAktualisieren(); }
   function pinFragen(zweck) {
     pinZweck = zweck;
-    $('gPinFrageText').textContent = zweck === 'export' ? tx('pinFrageExport') : tx('pinFrageZurueck');
+    $('gPinFrageText').textContent = zweck === 'export' ? tx('pinFrageExport') : (zweck === 'namen' ? tx('pinFrageNamen') : tx('pinFrageZurueck'));
     $('g_pin_frage').value = ''; meldung('gPinFrageMeldung', '');
     $('gPinVergessen').style.display = zweck === 'export' ? '' : 'none';
     $('gPinFrage').classList.add('an');
@@ -383,6 +429,7 @@
       $('gPinFrage').classList.remove('an'); pinZweck = null;
       if (zweck === 'zurueck') { A.zeige('gespraech'); schrittZeigen(3); }
       if (zweck === 'export') exportZeigen();
+      if (zweck === 'namen') namenZeigen();
     });
   }
   function pinVergessenFragen() {
@@ -491,6 +538,8 @@
   ['gNaechster', 'gProdukte'].forEach(function (id) { $(id).addEventListener('click', function () { setTimeout(wuenscheZeigen, 0); }); });
   $('gLos').addEventListener('click', losGehen);
   $('gExportLos').addEventListener('click', function () { pinFragen('export'); });
+  $('gNamenLos').addEventListener('click', namenLos);
+  $('gNamenOk').addEventListener('click', namenSpeichernKlick);
   $('gPinNeuOk').addEventListener('click', pinNeuSpeichern);
   $('g_pin2').addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); pinNeuSpeichern(); } });
   $('gWeiter').addEventListener('click', weiter);
@@ -535,7 +584,9 @@
     location.hash.replace(/^#/, '').split('&').forEach(function (p) { var a = p.split('='); if (a[0]) q[a[0]] = decodeURIComponent(a[1] || '1'); });
     if (!K.testmodus || !q.g) return;
     if (q.g === 'pin') { A.zeige('gPinNeu'); return; }
+    if (q.demonamen) standteamSpeichern(['Erika Beispiel', '', 'Max Muster', '']);
     var weiterGehen = function () {
+      if (q.g === 'namen') { namenZeigen(); return; }
       if (q.g === 'export') { exportZeigen(); if (q.frage) setTimeout(function () { exportZustand('frage'); meldung('gExportMeldung', tx('exportGeteilt')); }, 300); return; }
       gespraechStarten();
       if (q.demo) demoFuellen(q.vk);

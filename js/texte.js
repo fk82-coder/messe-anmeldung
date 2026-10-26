@@ -510,8 +510,15 @@
     von: 'Aufgenommen von',
     notiz: 'Messegespräch',
     notizHinweis: 'Nur Geschäftliches notieren – keine Gesundheits-, Patienten- oder Privatangaben, keine Wertungen über die Person; der Besucher kann diese Notiz im Wortlaut anfordern.',
-    notizRegel: 'Fertig schreiben, dann übergeben. Nach dem Absenden ist das Gespräch auf dem Bildschirm weg; es bleibt verschlüsselt gespeichert bis „Gespräche an den Vertrieb senden“. Nachträge danach bei Frau Fern.',
+    notizRegel: 'Fertig schreiben, dann übergeben. Nach dem Absenden ist das Gespräch auf dem Bildschirm weg; es bleibt verschlüsselt gespeichert bis „Gespräche an den Vertrieb senden“. Nachträge danach beim Vertrieb.',
     zeichen: 'Zeichen',
+    namenKnopf: 'Namen des Standteams',
+    namenTitel: 'Namen des Standteams',
+    namenText: 'Diese Namen erscheinen bei „Aufgenommen von“ und in der Datei für den Vertrieb. Sie bleiben nur auf diesem Tablet gespeichert. Leeres Feld = „Standteam 1“ bis „Standteam 4“.',
+    namenFeld: 'Standteam',
+    namenSpeichern: 'Namen speichern',
+    namenGespeichert: 'Gespeichert. „Aufgenommen von“ zeigt jetzt diese Namen.',
+    pinFrageNamen: 'Namen des Standteams ändern: bitte Messe-PIN eingeben.',
     fehlt: 'Bitte noch ausfüllen:',
     testzeile: 'TESTMODUS – nur Testdaten eingeben. Gespräche werden in einer eigenen Test-Ablage gespeichert.'
   };

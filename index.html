@@ -24,10 +24,6 @@
   </header>
   <main class="inhalt start-inhalt">
     <div class="start-links">
-      <h1 data-t="titel"></h1>
-      <p class="untertitel" data-t="untertitel"></p>
-      <button class="knopf knopf-blau knopf-los" id="los" data-t="los"></button>
-      <div class="vorteile"><span data-t="v1"></span><span data-t="v2"></span><span data-t="v3"></span></div>
       <div class="g-start" id="gStart">
         <span class="g-start-info" data-gt="startHinweis"></span>
         <div class="g-start-knoepfe">
@@ -36,7 +32,12 @@
         </div>
         <span class="g-start-info" id="gStartZaehler"></span>
         <span class="g-start-warnung" id="gStartWarnung"></span>
+        <button class="link g-namen-link" id="gNamenLos"><span data-gt="namenKnopf"></span> ›</button>
       </div>
+      <h1 data-t="titel"></h1>
+      <p class="untertitel" data-t="untertitel"></p>
+      <button class="knopf knopf-blau knopf-los" id="los" data-t="los"></button>
+      <div class="vorteile"><span data-t="v1"></span><span data-t="v2"></span><span data-t="v3"></span></div>
     </div>
     <div class="start-rechts">
       <div class="karte">
@@ -224,6 +225,21 @@
     </div>
   </main>
 </section>
+<section class="seite" id="gNamen">
+  <header class="kopf">
+    <img class="logo klein" src="bilder/logo.png" alt="Süsse Labortechnik">
+    <div class="kopf-mitte g-kopf"><b data-gt="namenTitel"></b></div>
+    <button class="knopf-rand" data-aktion="neu" data-gt="zurueckStart"></button>
+  </header>
+  <main class="inhalt g-einr">
+    <div class="g-einr-spalte">
+      <p class="klein" data-gt="namenText"></p>
+      <div class="g-namen" id="gNamenFelder"></div>
+      <div class="g-knoepfe"><button class="knopf knopf-blau" id="gNamenOk" data-gt="namenSpeichern"></button></div>
+      <p class="vk-meldung" id="gNamenMeldung" role="status"></p>
+    </div>
+  </main>
+</section>
 <section class="seite" id="gespraech">
   <header class="kopf">
     <img class="logo klein" src="bilder/logo.png" alt="Süsse Labortechnik">
@@ -299,7 +315,7 @@
     <button class="knopf knopf-blau" id="gWeiter" data-gt="weiter"></button>
   </div>
 </section>
-<section class="seite" id="gUebergabe">
+<section class="seite einw-rot" id="gUebergabe">
   <header class="kopf">
     <img class="logo klein" src="bilder/logo.png" alt="Süsse Labortechnik">
     <div class="kopf-mitte"></div>
@@ -330,7 +346,7 @@
           <p class="klein" data-t="nlSprache"></p>
         </div>
         <div class="karte vertrieb" id="gVertriebBox">
-          <div class="eyebrow"><span data-t="ewVertrieb"></span>&nbsp;<span class="frei" data-t="frei"></span></div>
+          <div class="eyebrow"><span data-t="ewVertrieb"></span><span class="frei" data-t="frei"></span></div>
           <label class="haken" for="g_vertrieb"><input type="checkbox" id="g_vertrieb"><span data-t="vertriebText"></span></label>
         </div>
       </div>

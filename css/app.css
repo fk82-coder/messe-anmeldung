@@ -296,6 +296,36 @@ input[type=email].vorschlag { background: #DCEBFD; border-color: #5B8FD6; }
 .karte.aus { opacity: .45; }
 .ds-kasten { border: 2px solid var(--blau); background: var(--blauhell); padding: .6em .8em; border-radius: 4px; }
 #gDanke .mitte { justify-content: flex-start; padding-top: 2em; }
+.einw-rot .spalte-einwilligung .karte { border: 2px solid var(--alarm); padding: 0 .85em .45em; overflow: hidden; }
+.einw-rot .spalte-einwilligung .eyebrow { background: var(--alarm); color: #fff; font-size: 1em; letter-spacing: .04em; line-height: 1.25;
+  margin: 0 -.85em .55em; padding: .45em .85em; flex-wrap: wrap; gap: .1em .55em; }
+.einw-rot .spalte-einwilligung .eyebrow::before { display: none; }
+.einw-rot .spalte-einwilligung .eyebrow .frei { color: #fff; font-weight: 700; font-size: .85em; }
+.einw-rot .g-ue-haken { font-size: 1.05em; margin-bottom: .35em; }
+.einw-rot .haken { gap: .8em; align-items: flex-start; }
+.einw-rot .haken input[type=checkbox] { -webkit-appearance: none; appearance: none; width: max(46px, 2.6em); height: max(46px, 2.6em);
+  flex: 0 0 auto; margin: 0; border: 3px solid #141414; border-radius: 6px; background: #fff; cursor: pointer; }
+.einw-rot .haken input[type=checkbox]:checked { border-color: var(--blau);
+  background: var(--blau) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 80% no-repeat; }
+.einw-rot .haken input[type=checkbox]:disabled { border-color: #9AA0A6; cursor: default; }
+.einw-rot .haken input[type=checkbox]:focus-visible { outline: 3px solid var(--blau); outline-offset: 3px; }
+#start.mit-gespraech .start-inhalt { padding-top: 1.4em; }
+#start.mit-gespraech .g-start { margin: 0 0 1.2em; padding: 0 0 1.1em; border-top: 0; border-bottom: 1px dashed var(--linie); gap: .5em; }
+#start.mit-gespraech .g-start-knoepfe { flex-direction: column; align-items: flex-start; gap: .6em; }
+#start.mit-gespraech #gLos { background: var(--blau); color: #fff; border-color: var(--blau); font-size: 1.55em; padding: .7em 1.5em; min-height: 3em; border-radius: 4px; }
+#start.mit-gespraech .g-namen-link { font-size: .78em; min-height: 44px; padding: 0; }
+#start.mit-gespraech h1 { font-size: 1.2em; margin-bottom: .2em; }
+#start.mit-gespraech .untertitel { font-size: .78em; margin-bottom: .2em; }
+#start.mit-gespraech .knopf-los { font-size: .85em; padding: .45em 1.1em; min-height: 44px; margin: .35em 0 .2em; }
+#start.mit-gespraech .vorteile { font-size: .66em; margin-top: .5em; }
+#start.mit-gespraech .start-rechts .karte { font-size: .78em; }
+.g-namen-link { display: none; }
+#start.mit-gespraech .g-namen-link { display: inline-flex; align-items: center; gap: .3em; }
+.g-namen { display: grid; grid-template-columns: 1fr 1fr; gap: .7em 1.2em; }
+@media (max-width: 759.98px) {
+  #start.mit-gespraech #gLos { font-size: 1.25em; padding: .6em 1em; width: 100%; }
+  .g-namen { grid-template-columns: 1fr; }
+}
 @media (max-width: 759.98px), (orientation: portrait) {
   .g-schritt.an { flex-direction: column; gap: 1em; }
   .g-leiste { padding: .5em 1em; gap: .6em; }

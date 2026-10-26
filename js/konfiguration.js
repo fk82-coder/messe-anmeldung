@@ -1,5 +1,5 @@
 window.KONFIG = {
-  version: '0.4.0',
+  version: '0.4.1',
   testmodus: true,
   messe: 'DVG 2026',
   standardSprache: 'de',
@@ -42,6 +42,7 @@ window.KONFIG = {
     aktiv: true,
     kuerzel: 'DVG26',
     standteam: ['Standteam 1', 'Standteam 2', 'Standteam 3', 'Standteam 4'],
+    standteamNameHoechstens: 40,
     empfaenger: 'a.fern@suesse.de',
     ziel: 'datei',
     warnenNachStunden: 72,
