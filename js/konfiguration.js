@@ -1,5 +1,5 @@
 window.KONFIG = {
-  version: '0.3.11',
+  version: '0.4.0',
   testmodus: true,
   messe: 'DVG 2026',
   standardSprache: 'de',
@@ -38,6 +38,20 @@ window.KONFIG = {
     sprachen: 'deu+eng',
     seitenmodus: 3
   },
+  gespraech: {
+    aktiv: true,
+    kuerzel: 'DVG26',
+    standteam: ['Standteam 1', 'Standteam 2', 'Standteam 3', 'Standteam 4'],
+    empfaenger: 'a.fern@suesse.de',
+    ziel: 'datei',
+    warnenNachStunden: 72,
+    pinMindestens: 6,
+    leerlaufSekunden: 300,
+    notizHoechstens: 2000,
+    textHoechstens: 1000,
+    webDatenschutzErgaenzt: false,
+    texteGeprueft: true
+  },
   festeFelder: {},
   sprachen: {
     de: { formular: 'FEHLT – Formular-Adresse DE', text: 'Text DE v2', doi: 'DOI DE v1', freigegeben: true,
@@ -63,6 +77,18 @@ window.KONFIG = {
     interessen: {
       versand: 'Probenversand', gefaesse: 'Probengefäße und Röhrchen', sekundaer: 'Sekundärgefäße und Transportbehälter',
       patho: 'Pathologie- und Histologiebedarf', labor: 'Laborbedarf allgemein'
-    }
+    },
+    produktgruppen: {
+      abstrich: 'Abstrichsysteme / Watteträger', bio: 'BIO Transport', chemie: 'Chemikalien', einbett: 'Einbettkassetten',
+      entnahme: 'Entnahmehilfe', etiketten: 'Etiketten', faerbe: 'Färbesysteme', formalin: 'Formalin Gefäße', gefaesse: 'Gefäße',
+      gestelle: 'Gestelle / Aufbewahrung', objekttraeger: 'Objektträger', pcr: 'PCR', pipetten: 'Pipettenspitzen und Pipetten',
+      roehrchen: 'Röhrchen', sicherheit: 'Sicherheitsbehälter', versand: 'Versand / Verpackung'
+    },
+    chemieGruppen: ['chemie', 'formalin', 'faerbe'],
+    naechster: {
+      angebot: 'Angebot', muster: 'Muster', rueckruf: 'Rückruf (ausdrücklich gewünscht)', unterlagen: 'Unterlagen schicken',
+      besuch: 'Besuch', nichts: 'nichts weiter'
+    },
+    bewertung: { heiss: 'heiß', warm: 'warm', kalt: 'kalt' }
   }
 };

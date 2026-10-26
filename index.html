@@ -28,6 +28,15 @@
       <p class="untertitel" data-t="untertitel"></p>
       <button class="knopf knopf-blau knopf-los" id="los" data-t="los"></button>
       <div class="vorteile"><span data-t="v1"></span><span data-t="v2"></span><span data-t="v3"></span></div>
+      <div class="g-start" id="gStart">
+        <span class="g-start-info" data-gt="startHinweis"></span>
+        <div class="g-start-knoepfe">
+          <button class="knopf-rand g-start-knopf" id="gLos"><span data-gt="startKnopf"></span> ›</button>
+          <button class="knopf-rand g-start-knopf" id="gExportLos"><span data-gt="exportKnopf"></span> ›</button>
+        </div>
+        <span class="g-start-info" id="gStartZaehler"></span>
+        <span class="g-start-warnung" id="gStartWarnung"></span>
+      </div>
     </div>
     <div class="start-rechts">
       <div class="karte">
@@ -175,6 +184,199 @@
     <div class="testuebertragung" id="testUebertragung"></div>
   </main>
 </section>
+<section class="seite" id="gPinNeu">
+  <header class="kopf">
+    <img class="logo klein" src="bilder/logo.png" alt="Süsse Labortechnik">
+    <div class="kopf-mitte g-kopf"><b data-gt="pinNeuTitel"></b></div>
+    <button class="knopf-rand" data-aktion="neu" data-gt="abbrechen"></button>
+  </header>
+  <main class="inhalt g-einr">
+    <div class="g-einr-spalte">
+      <p class="klein" data-gt="pinNeuText"></p>
+      <div class="zwei">
+        <div class="feld g-pin"><label for="g_pin1" data-gt="pin1"></label><input type="password" id="g_pin1" inputmode="numeric" autocomplete="off"></div>
+        <div class="feld g-pin"><label for="g_pin2" data-gt="pin2"></label><input type="password" id="g_pin2" inputmode="numeric" autocomplete="off"></div>
+      </div>
+      <p class="vk-meldung" id="gPinMeldung" role="status"></p>
+      <div class="g-knoepfe"><button class="knopf knopf-blau" id="gPinNeuOk" data-gt="pinNeuOk"></button></div>
+    </div>
+  </main>
+</section>
+<section class="seite" id="gExport">
+  <header class="kopf">
+    <img class="logo klein" src="bilder/logo.png" alt="Süsse Labortechnik">
+    <div class="kopf-mitte g-kopf"><b data-gt="exportTitel"></b></div>
+    <button class="knopf-rand" data-aktion="neu" data-gt="zurueckStart"></button>
+  </header>
+  <main class="inhalt g-einr">
+    <div class="g-einr-spalte g-export">
+      <div class="entwurfmarke" id="gExportTestmarke" data-gt="testmarke"></div>
+      <p class="klein"><span data-gt="exportText"></span> <b id="gExportAn"></b></p>
+      <p class="g-export-anzahl"><span data-gt="exportAnzahl"></span> <b id="gExportAnzahl">0</b></p>
+      <div class="g-export-liste"><table><thead><tr><th data-gt="sp_nr"></th><th data-gt="sp_zeit"></th><th data-gt="sp_einr"></th><th data-gt="sp_bew"></th><th data-gt="sp_schritt"></th></tr></thead><tbody id="gExportListe"></tbody></table></div>
+      <div class="g-knoepfe"><button class="knopf knopf-blau" id="gExportDatei" data-gt="exportDatei"></button></div>
+      <p class="vk-meldung" id="gExportMeldung" role="status"></p>
+      <div class="karte g-export-frage" id="gExportFrage">
+        <p><b data-gt="exportFrage"></b></p>
+        <div class="g-knoepfe"><button class="knopf knopf-braun g-ja" id="gExportJa" data-gt="exportJa"></button><button class="knopf-rand" id="gExportNein" data-gt="exportNein"></button></div>
+      </div>
+      <p class="klein" data-gt="exportRegel"></p>
+    </div>
+  </main>
+</section>
+<section class="seite" id="gespraech">
+  <header class="kopf">
+    <img class="logo klein" src="bilder/logo.png" alt="Süsse Labortechnik">
+    <div class="kopf-mitte g-kopf">
+      <b data-gt="titel"></b>
+      <span class="g-schritte"><span class="g-sch" data-schritt="1" data-gt="schritt1"></span><span class="g-sch" data-schritt="2" data-gt="schritt2"></span><span class="g-sch" data-schritt="3" data-gt="schritt3"></span></span>
+    </div>
+    <button class="knopf-rand" data-aktion="neu" data-gt="abbrechen"></button>
+  </header>
+  <div class="g-testzeile" id="gTestzeile" data-gt="testzeile"></div>
+  <main class="inhalt g-inhalt">
+    <div class="g-schritt" data-schritt="1">
+      <div class="g-spalte">
+        <div class="vk" id="gVkBox">
+          <button type="button" class="vk-knopf" id="gVkKnopf"><svg class="vk-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-2.5h6L17 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><circle cx="12" cy="13.2" r="3.9" fill="none" stroke="currentColor" stroke-width="1.9"/></svg><span data-gt="vkKnopf"></span></button>
+          <p class="vk-hinweis" data-gt="vkHinweis"></p>
+          <p class="vk-meldung" id="gVkMeldung" role="status"></p>
+        </div>
+        <div class="feld">
+          <label for="g_email"><span data-gt="email"></span> <span class="pflicht">*</span></label>
+          <input type="email" id="g_email" inputmode="email" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="name@example.com">
+          <span class="email-pruefen" id="gEmailPruefen" role="status"></span>
+        </div>
+        <div class="feld">
+          <label for="g_telefon"><span data-gt="telefon"></span> <span class="pflicht">*</span></label>
+          <input type="tel" id="g_telefon" inputmode="tel" autocomplete="off" autocorrect="off" spellcheck="false">
+        </div>
+        <p class="g-regel"><span class="pflicht">*</span> <span data-gt="emailOderTelefon"></span></p>
+        <div class="feld"><label for="g_land"><span data-gt="land"></span> <span class="pflicht">*</span></label><select id="g_land" autocomplete="off"></select></div>
+      </div>
+      <div class="g-spalte">
+        <div class="zwei">
+          <div class="feld"><label for="g_vorname" data-gt="vorname"></label><input type="text" id="g_vorname" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+          <div class="feld"><label for="g_nachname" data-gt="nachname"></label><input type="text" id="g_nachname" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+        </div>
+        <div class="feld"><label for="g_position" data-gt="position"></label><input type="text" id="g_position" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+        <div class="feld"><label for="g_einrichtung"><span data-gt="einrichtung"></span> <span class="pflicht">*</span></label><input type="text" id="g_einrichtung" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+        <div class="feld"><span class="lbl"><span data-gt="einrichtungstyp"></span> <span class="pflicht">*</span></span><div class="chips" data-gruppe="g_typ" id="gTyp"></div></div>
+      </div>
+    </div>
+    <div class="g-schritt" data-schritt="2">
+      <div class="g-spalte">
+        <div class="feld"><span class="lbl"><span data-gt="produkte"></span> <span class="pflicht">*</span> <span class="frei" data-gt="mehrere"></span></span><div class="chips mehrfach" data-gruppe="g_produkte" id="gProdukte"></div></div>
+        <p class="g-chemie" id="gChemie" data-gt="chemieHinweis"></p>
+      </div>
+      <div class="g-spalte">
+        <div class="feld"><span class="lbl"><span data-gt="naechster"></span> <span class="pflicht">*</span> <span class="frei" data-gt="mehrere"></span></span><div class="chips mehrfach" data-gruppe="g_naechster" id="gNaechster"></div></div>
+        <div class="feld g-wunsch" id="gAngebotBox"><label for="g_angebot" data-gt="angebot"></label><textarea id="g_angebot" rows="2" autocomplete="off"></textarea></div>
+        <div class="feld g-wunsch" id="gMusterBox"><label for="g_muster" data-gt="muster"></label><textarea id="g_muster" rows="2" autocomplete="off"></textarea>
+          <label for="g_anschrift" data-gt="anschrift"></label><textarea id="g_anschrift" rows="3" autocomplete="off"></textarea>
+          <p class="klein" data-gt="anschriftHinweis"></p></div>
+      </div>
+    </div>
+    <div class="g-schritt" data-schritt="3">
+      <div class="g-spalte g-spalte-schmal">
+        <div class="feld"><span class="lbl"><span data-gt="bewertung"></span> <span class="pflicht">*</span></span><div class="chips g-senkrecht" data-gruppe="g_bewertung" id="gBewertung"></div></div>
+        <div class="feld"><span class="lbl"><span data-gt="von"></span> <span class="pflicht">*</span></span><div class="chips" data-gruppe="g_von" id="gVon"></div></div>
+      </div>
+      <div class="g-spalte g-spalte-breit">
+        <div class="feld g-notiz">
+          <label for="g_notiz" data-gt="notiz"></label>
+          <p class="g-notiz-hinweis" data-gt="notizHinweis"></p>
+          <textarea id="g_notiz" rows="9" autocomplete="off"></textarea>
+          <span class="klein g-zeichen"><b id="gZeichen">0</b> / <span id="gZeichenMax"></span> <span data-gt="zeichen"></span></span>
+          <p class="klein" data-gt="notizRegel"></p>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div class="g-leiste">
+    <p class="g-fehlt" id="gFehlt" role="status"></p>
+    <button class="knopf-rand" id="gZurueck" data-gt="zurueck"></button>
+    <button class="knopf knopf-blau" id="gWeiter" data-gt="weiter"></button>
+  </div>
+</section>
+<section class="seite" id="gUebergabe">
+  <header class="kopf">
+    <img class="logo klein" src="bilder/logo.png" alt="Süsse Labortechnik">
+    <div class="kopf-mitte"></div>
+    <div class="flaggen klein" data-flaggen></div>
+    <button class="knopf-rand" id="gUeZurueck" data-t="gZurueckTeam"></button>
+  </header>
+  <main class="inhalt formular-inhalt g-ue">
+    <div class="spalte-angaben">
+      <h2 data-t="gUeTitel"></h2>
+      <div class="karte g-kurz">
+        <div class="eyebrow" data-t="gUeEw"></div>
+        <div class="entwurfmarke" id="gRechtEntwurf"></div>
+        <p id="gKurz"></p>
+        <button class="link" data-aktion="datenschutz" data-t="dsLink"></button>
+      </div>
+      <div class="g-zusammen">
+        <p><b data-t="gUeKontakt"></b> <span id="gUeKontakt"></span></p>
+        <p><b data-t="gUeWuensche"></b> <span id="gUeWuensche"></span></p>
+      </div>
+    </div>
+    <div class="spalte-einwilligung">
+      <div class="einw-rollen">
+        <p class="g-ue-haken" data-t="gUeHaken"></p>
+        <p class="hinweis-offline" id="gUeEmailFehlt" data-t="gUeEmailFehlt"></p>
+        <div class="karte" id="gNlBox">
+          <div class="eyebrow" data-t="ewEinw"></div>
+          <label class="haken" for="g_haken"><input type="checkbox" id="g_haken"><span data-t="einwilligung"></span></label>
+          <p class="klein" data-t="nlSprache"></p>
+        </div>
+        <div class="karte vertrieb" id="gVertriebBox">
+          <div class="eyebrow"><span data-t="ewVertrieb"></span>&nbsp;<span class="frei" data-t="frei"></span></div>
+          <label class="haken" for="g_vertrieb"><input type="checkbox" id="g_vertrieb"><span data-t="vertriebText"></span></label>
+        </div>
+      </div>
+      <div class="knopfleiste">
+        <button class="knopf knopf-braun" id="gSenden" data-t="gKnopf"></button>
+        <p class="unter-knopf" id="gUnterKnopf"></p>
+      </div>
+    </div>
+  </main>
+</section>
+<section class="seite" id="gDanke">
+  <header class="kopf">
+    <img class="logo klein" src="bilder/logo.png" alt="Süsse Labortechnik">
+    <div class="kopf-mitte"></div>
+  </header>
+  <main class="inhalt mitte">
+    <div class="haekchen">✓</div>
+    <h1 data-t="danke"></h1>
+    <p class="gross" data-t="gDanke1"></p>
+    <div id="gDankeNl">
+      <p class="gross" data-t="danke1"></p>
+      <p class="gross" data-t="danke2"></p>
+      <p class="klein" data-t="spam"></p>
+    </div>
+    <p class="gross" id="gDankeZwei" data-t="dankeZwei"></p>
+    <div id="gDankeOff">
+      <p class="gross" data-t="off1"></p>
+      <p class="klein" data-t="off3"></p>
+    </div>
+    <p class="klein"><span data-t="gDankeNr"></span> <b id="gNr"></b></p>
+    <div class="zaehler"><span data-t="geleert"></span> <b id="gCountdown">10</b> s</div>
+    <div class="testuebertragung" id="gTestUebertragung"></div>
+  </main>
+</section>
+<div class="ueber" id="gPinFrage">
+  <div class="karte ueber-karte g-pin-karte">
+    <p id="gPinFrageText"></p>
+    <input type="password" id="g_pin_frage" inputmode="numeric" autocomplete="off">
+    <p class="vk-meldung" id="gPinFrageMeldung" role="status"></p>
+    <div class="g-knoepfe">
+      <button class="knopf knopf-blau" id="gPinFrageOk" data-gt="pinOk"></button>
+      <button class="knopf-rand" id="gPinFrageAbbrechen" data-gt="pinAbbrechen"></button>
+      <button class="link" id="gPinVergessen" data-gt="pinVergessen"></button>
+    </div>
+  </div>
+</div>
 <section class="seite" id="nichtEingerichtet">
   <main class="inhalt mitte ne-inhalt">
     <p class="ne-bitte" lang="de">Bitte wenden Sie sich an unser Team.</p>
@@ -210,6 +412,7 @@
 </div>
 <footer class="fuss" id="fuss">
   <span id="wartend" class="wartend"></span>
+  <span id="gStatus" class="wartend"></span>
   <span id="testleiste" class="testleiste"></span>
   <span id="warnung" class="warnung"></span>
   <span class="fuss-ver-handy">Messe-App <b id="versionHandy"></b></span>
@@ -222,5 +425,6 @@
 <script src="js/versand.js"></script>
 <script src="js/visitenkarte.js"></script>
 <script src="js/app.js"></script>
+<script src="js/gespraech.js"></script>
 </body>
 </html>

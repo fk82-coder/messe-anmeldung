@@ -34,11 +34,22 @@
     var v = K.visitenkarte || {}, tx = window.TEXTE[lang] || {}, t = tx.dsTeile || {};
     return !!(v.aktiv && t.vkMit && t.vkOhne && tx.vkHinweis && tx.vkKnopf);
   }
+  function gespraechAktiv() { return !!(K.gespraech && K.gespraech.aktiv); }
   function dsText(lang) {
     var tx = window.TEXTE[lang] || window.TEXTE.de, t = tx.dsTeile || {}, tp = telPosVerfuegbar(lang);
-    return String(tx.dsText || '')
+    var g = gespraechAktiv() ? tx.dsG : null;
+    var s = String(tx.dsText || '')
       .replace('{{VERTRIEB_SATZ1}}', tp ? (t.vertriebSatz1Mit || '') : (t.vertriebSatz1Ohne || ''))
-      .replace('{{VISITENKARTE}}', vkVerfuegbar(lang) ? (tp ? t.vkMit : t.vkOhne) : '');
+      .replace('{{VISITENKARTE}}', vkVerfuegbar(lang) ? (g ? g.b4 : (tp ? t.vkMit : t.vkOhne)) : '');
+    if (g) {
+      s = s.replace(g.vorB1, g.b1 + g.b2 + g.vorB1).replace(g.b3alt, g.b3).replace(g.b3endeAlt, g.b3endeAlt + ' ' + g.b3zusatz)
+        .replace(g.b5alt, g.b5).replace(g.b6alt, g.b6);
+    }
+    return s;
+  }
+  function dsTitel(lang) {
+    var tx = window.TEXTE[lang] || window.TEXTE.de;
+    return gespraechAktiv() && tx.dsG ? tx.dsG.titel : tx.dsTitel;
   }
   function textKennung(lang) {
     var s = K.sprachen[lang];
@@ -255,6 +266,8 @@
     telPosVerfuegbar: telPosVerfuegbar,
     vkVerfuegbar: vkVerfuegbar,
     dsText: dsText,
+    dsTitel: dsTitel,
+    gespraechAktiv: gespraechAktiv,
     angeboteneSprachen: angeboteneSprachen,
     istFehlend: istFehlend,
     warnung: function () { return warnung; },

@@ -27,6 +27,7 @@
   }
   function text(k) {
     if (k === 'dsText') return V.dsText(lang);
+    if (k === 'dsTitel') return V.dsTitel(lang);
     return (T[lang] && T[lang][k] !== undefined) ? T[lang][k] : T.de[k];
   }
   function setzeSprache(l) {
@@ -50,6 +51,7 @@
       m.textContent = 'TESTMODUS – ' + T[l].rechtStand + '. Für den Messebetrieb fehlt: ' + kurz.join('; ') + '.';
       m.classList.add('an');
     } else { m.textContent = ''; m.classList.remove('an'); }
+    if (window.Gespraech) window.Gespraech.spracheGeaendert(l);
   }
   function zeige(id) {
     document.querySelectorAll('.seite').forEach(function (s) { s.classList.toggle('aktiv', s.id === id); });
@@ -97,6 +99,7 @@
   function neu() {
     clearInterval(dankeTimer);
     leeren();
+    if (window.Gespraech) window.Gespraech.leeren();
     setzeSprache(K.standardSprache);
     zeige('start');
     neuLadenWennRuhig();
@@ -109,9 +112,11 @@
   }
   function leerlauf() {
     clearTimeout(leerTimer);
+    var imGespraech = window.Gespraech && window.Gespraech.seiteAktiv();
+    var sek = imGespraech ? ((K.gespraech || {}).leerlaufSekunden || K.leerlaufSekunden) : K.leerlaufSekunden;
     leerTimer = setTimeout(function () {
       if (!$('start').classList.contains('aktiv') || lang !== K.standardSprache) neu();
-    }, K.leerlaufSekunden * 1000);
+    }, sek * 1000);
   }
   ['pointerdown', 'keydown', 'input'].forEach(function (t) { document.addEventListener(t, leerlauf, true); });
   var kameraAussen = false, kameraAussenUhr = null;
@@ -155,7 +160,7 @@
   function chipWerte(gruppe) {
     return Array.prototype.map.call(document.querySelectorAll('.chips[data-gruppe="' + gruppe + '"] .chip.an'), function (c) { return c.getAttribute('data-wert'); });
   }
-  function istTextfeld(e) { return !!e && e.tagName === 'INPUT' && /^(text|email|tel|search|url|number)$/.test(e.type); }
+  function istTextfeld(e) { return !!e && ((e.tagName === 'INPUT' && /^(text|email|tel|search|url|number|password)$/.test(e.type)) || e.tagName === 'TEXTAREA'); }
   function cursorZeigen() {
     var a = document.activeElement;
     if (istTextfeld(a)) a.scrollIntoView({ block: 'center', inline: 'nearest' });
@@ -245,6 +250,9 @@
   function datenschutz(an) { $('datenschutz').classList.toggle('an', an); }
   var VK = window.Visitenkarte, vkLaufNr = 0;
   var VK_ZIELE = { email: 'f_email', vorname: 'f_vorname', nachname: 'f_nachname', einrichtung: 'f_einrichtung', telefon: 'f_telefon', position: 'f_position' };
+  var VK_NEWSLETTER = { felder: VK_ZIELE, meldung: 'vkMeldung', email: 'f_email', emailHinweis: 'emailPruefen', anleitung: null,
+    telPos: function () { return V.telPosVerfuegbar(lang); }, nachher: function () { pruefen(); } };
+  var vkZiel = VK_NEWSLETTER;
   function vkAn() { return !!VK && V.vkVerfuegbar(lang) && typeof WebAssembly === 'object' && 'createImageBitmap' in window; }
   function vkZeigen() {
     $('vkBox').classList.toggle('an', vkAn());
@@ -253,7 +261,7 @@
     if (!tp) ['f_telefon', 'f_position'].forEach(function (i) { $(i).value = ''; $(i).classList.remove('vorschlag'); });
   }
   function vkMeldung(t, warn) {
-    var m = $('vkMeldung');
+    var m = $(vkZiel.meldung);
     m.textContent = t || ''; m.classList.toggle('an', !!t); m.classList.toggle('warn', !!warn);
   }
   function vkKameraZu() {
@@ -310,6 +318,7 @@
   function vkStarten() {
     if (!vkAn()) return;
     vkAbbrechen(); vkMeldung('');
+    document.querySelector('#vkKamera .vk-anleitung').innerHTML = vkZiel.anleitung || text('vkAnleitung');
     VK.vorwaermen().catch(function () { });
     if (!VK.kameraMoeglich() || kameraInSeiteGesperrt) { vkDateiWeg(); return; }
     var nr = vkLaufNr;
@@ -326,7 +335,7 @@
       else vkMeldung(text('vkNochmal'), true);
     });
   }
-  $('vkKnopf').addEventListener('click', vkStarten);
+  $('vkKnopf').addEventListener('click', function () { vkZiel = VK_NEWSLETTER; vkStarten(); });
   $('vkAusloeser').addEventListener('click', function () {
     var bild;
     try { bild = VK.ausVideo($('vkVideo'), $('vkRahmen')); } catch (e) { bild = null; }
@@ -353,7 +362,7 @@
   function vkLesen(bild) {
     var nr = vkLaufNr;
     $('vkLesen').classList.add('an');
-    VK.erkennen(bild, { mitTelPos: V.telPosVerfuegbar(lang), zeitlimitSekunden: (K.visitenkarte || {}).zeitlimitSekunden }).then(function (erg) {
+    VK.erkennen(bild, { mitTelPos: vkZiel.telPos(), zeitlimitSekunden: (K.visitenkarte || {}).zeitlimitSekunden }).then(function (erg) {
       if (nr !== vkLaufNr) return;
       $('vkLesen').classList.remove('an');
       vkUebernehmen(erg.felder);
@@ -365,38 +374,39 @@
     });
   }
   function vkUebernehmen(f) {
-    var n = 0, tp = V.telPosVerfuegbar(lang);
-    Object.keys(VK_ZIELE).forEach(function (k) {
-      var el = $(VK_ZIELE[k]);
+    var n = 0, tp = vkZiel.telPos(), ziele = vkZiel.felder;
+    Object.keys(ziele).forEach(function (k) {
+      var el = $(ziele[k]);
       if (!f[k]) return;
       if ((k === 'telefon' || k === 'position') && !tp) return;
       if (el.value && !el.classList.contains('vorschlag')) return;
       el.value = f[k]; el.classList.add('vorschlag'); n++;
     });
-    pruefen();
+    vkZiel.nachher();
     if (!n) vkMeldung(text('vkSchlecht'), true);
     else if (!f.email) vkMeldung(text('vkOhneEmail'), true);
     else vkMeldung(text('vkPruefen'));
     emailMarkieren();
   }
   function emailMarkieren() {
-    var e = $('f_email');
-    if (e.value && !e.classList.contains('vorschlag')) { emailMarkeWeg(); return; }
+    var z = vkZiel, e = $(z.email);
+    if (e.value && !e.classList.contains('vorschlag')) { emailMarkeWeg(z); return; }
     e.classList.add('pruefen');
-    var h = $('emailPruefen'), k = e.value ? 'vkEmailPruefen' : 'vkEmailEintippen';
+    var h = $(z.emailHinweis), k = e.value ? 'vkEmailPruefen' : 'vkEmailEintippen';
     h.setAttribute('data-t', k);
     h.textContent = text(k);
     h.classList.add('an');
   }
-  function emailMarkeWeg() {
-    var h = $('emailPruefen');
-    $('f_email').classList.remove('pruefen'); h.classList.remove('an'); h.removeAttribute('data-t'); h.textContent = '';
+  function emailMarkeWeg(z) {
+    z = (z && z.email) ? z : VK_NEWSLETTER;
+    var h = $(z.emailHinweis);
+    $(z.email).classList.remove('pruefen'); h.classList.remove('an'); h.removeAttribute('data-t'); h.textContent = '';
   }
-  $('f_email').addEventListener('input', emailMarkeWeg);
+  $('f_email').addEventListener('input', function () { emailMarkeWeg(VK_NEWSLETTER); });
   Object.keys(VK_ZIELE).forEach(function (k) { $(VK_ZIELE[k]).addEventListener('input', function () { this.classList.remove('vorschlag'); }); });
   function zaehlerZeigen() {
     return S.anzahl().then(function (n) {
-      $('wartend').textContent = n > 0 ? ('Standteam: ' + n + (n === 1 ? ' Anmeldung wartet' : ' Anmeldungen warten')) : '';
+      $('wartend').textContent = n > 0 ? ('Standteam: ' + n + (n === 1 ? ' Eintrag wartet' : ' Einträge warten')) : '';
       var w = V.warnung();
       $('warnung').textContent = w ? ('Technik: Rückmeldung enthält ' + w + ' – bitte Technik informieren') : '';
       $('warnung').classList.toggle('an', !!w);
@@ -515,5 +525,12 @@
     }
     testleisteZeigen();
   }
+  window.App = {
+    zeige: zeige, neu: neu, text: text, lang: function () { return lang; }, leerlauf: leerlauf,
+    vkAn: vkAn, vkAbbrechen: vkAbbrechen, emailMarkeWeg: emailMarkeWeg,
+    vkStarten: function (ziel) { vkZiel = ziel || VK_NEWSLETTER; vkStarten(); },
+    vkUebernehmen: function (ziel, f) { vkZiel = ziel || VK_NEWSLETTER; vkUebernehmen(f); },
+    zaehlerZeigen: zaehlerZeigen, datenschutz: datenschutz, esc: esc, emailOk: emailOk, wachHalten: wachHalten
+  };
   starten();
 })();

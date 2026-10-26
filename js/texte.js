@@ -46,6 +46,38 @@
     '<p><b>Your rights:</b> You have the right of access, rectification, erasure, restriction of processing and data portability. You may object to the storage of the proof of consent. You may lodge a complaint with a data protection supervisory authority, for example the Hessian Commissioner for Data Protection and Freedom of Information.</p>' +
     '<p><b>Voluntary:</b> All information is voluntary. Without an email address we cannot send you the newsletter. The content you receive is based solely on the information you provide; we do not analyse your behaviour. No automated decision-making takes place.</p>';
   var DS_FEHLT = '<p class="entwurfmarke">Der Datenschutzhinweis in dieser Sprache fehlt noch (Übersetzung und Prüfung offen). Ohne ihn wird diese Sprache am Stand nicht angeboten.</p>';
+  var DS_G = {
+    de: {
+      titel: 'Datenschutzhinweis zu Newsletter, Vertriebskontakt und Ihrer Anfrage am Messestand',
+      b1: '<p><b>Ihre Anfrage am Messestand:</b> Sprechen Sie mit unserem Standteam, notiert es Ihre Anfrage in dieser App: Ihre Kontaktdaten (auf Wunsch aus Ihrer Visitenkarte), Ihre Anschrift, wenn Sie Muster wünschen, Ihre Interessen und Angaben zu Ihrem Bedarf (zum Beispiel Produkte, Mengen, Zeitpunkt, heutiger Lieferant), welche Angebote, Muster oder Unterlagen Sie wünschen, ob Sie einen Rückruf möchten, eine kurze Notiz zum Gespräch, unsere Einschätzung Ihres Bedarfs und wer Sie betreut hat. Wir verwenden diese Angaben, um Ihnen das Gewünschte zu senden, Sie dazu zu kontaktieren und intern auszuwerten, welche Produkte auf der Messe gefragt waren. Rechtsgrundlage ist unser berechtigtes Interesse, Ihre Anfrage zu bearbeiten und Sie als Kunden zu gewinnen (Art. 6 Abs. 1 lit. f DSGVO); fragen Sie für Ihr eigenes Unternehmen an, auch die Durchführung vorvertraglicher Maßnahmen auf Ihre Anfrage (Art. 6 Abs. 1 lit. b DSGVO). Werbung per E-Mail über Ihre Anfrage hinaus senden wir Ihnen nur mit Ihrem Häkchen „Kontakt durch unseren Vertrieb“. Die Angaben sind freiwillig; ohne sie können wir Ihnen kein Angebot und kein Muster senden. Bis zur Übergabe bleiben die Angaben verschlüsselt auf dem Tablet; unser Standteam übergibt sie per E-Mail an unseren Vertrieb und löscht sie danach auf dem Tablet. Die Angaben erhalten nur die zuständigen Mitarbeiter von Süsse. Wird aus Ihrer Anfrage kein Geschäft, löschen wir sie zwölf Monate nach unserem letzten Kontakt. Kommt es zu einer Bestellung, gelten für Angebote, Bestellungen und Rechnungen die gesetzlichen Aufbewahrungsfristen.</p>',
+      b2: '<p class="ds-kasten"><b>Ihr Widerspruchsrecht:</b> <b>Sie können der Verwendung Ihrer Angaben für Werbung jederzeit widersprechen, ohne Angabe von Gründen</b> – formlos, zum Beispiel mit einer kurzen Antwort auf eine E-Mail unseres Vertriebs oder telefonisch unter 05603 502-0. Danach verwenden wir Ihre Angaben nicht mehr für Werbung. Auch der übrigen Verarbeitung auf Grundlage unseres berechtigten Interesses können Sie aus Gründen widersprechen, die sich aus Ihrer besonderen Situation ergeben (Art. 21 DSGVO).</p>',
+      b3alt: 'wird Ihre Anmeldung verschlüsselt auf dem Tablet zwischengespeichert.',
+      b3: 'wird Ihre Anmeldung zu Newsletter oder Vertriebskontakt verschlüsselt auf dem Tablet zwischengespeichert.',
+      b3endeAlt: 'Gelingt die Übertragung nicht innerhalb von drei Tagen, wird sie gelöscht.',
+      b3zusatz: 'Die Notiz zu Ihrer Anfrage am Messestand bleibt verschlüsselt auf dem Tablet, bis unser Standteam sie per E-Mail an unseren Vertrieb übergibt; danach wird sie auf dem Tablet gelöscht.',
+      b4: '<p><b>Visitenkarte (freiwillig):</b> Auf Wunsch fotografiert das Tablet Ihre eigene Visitenkarte und liest den Text selbst aus, um die Felder vorzufüllen; im Gespräch übernimmt das unser Standteam mit der Karte, die Sie ihm dafür geben. Die Texterkennung läuft vollständig auf dem Tablet. Foto und erkannter Text verlassen das Tablet nicht, bleiben nur im Arbeitsspeicher und werden sofort verworfen. Übernommen werden nur E-Mail-Adresse, Vorname, Nachname, Labor/Firma/Einrichtung/Klinik, Telefonnummer und Position, bei einer Anfrage mit Musterwunsch zusätzlich Ihre Anschrift; alle übrigen Angaben der Karte übernehmen wir nicht. Für den Newsletter senden wir Telefonnummer, Position und Anschrift nie; Telefonnummer und Position erhält der Vertrieb nur mit Ihrem zweiten Häkchen oder als Teil Ihrer Anfrage. Die Vorschläge werden vor dem Senden geprüft und können geändert oder gelöscht werden. Danach verwenden wir die Angaben wie eingetippte (siehe „Wofür“, „Kontakt durch unseren Vertrieb“ und „Ihre Anfrage am Messestand“). Rechtsgrundlage für das Auslesen ist unser berechtigtes Interesse, das Eintippen zu ersparen (Art. 6 Abs. 1 lit. f DSGVO).</p>',
+      b5alt: 'An andere geben wir Ihre Daten nicht weiter.',
+      b5: 'Die Notiz zu Ihrer Anfrage am Messestand übergibt unser Standteam per E-Mail an unseren Vertrieb. Unsere E-Mails laufen über Microsoft 365 (Exchange Online); Microsoft arbeitet dabei in unserem Auftrag (Auftragsverarbeitung nach Art. 28 DSGVO) und speichert die Daten in der EU. In begrenzten Fällen, etwa für Betrieb und Sicherheit, kann Microsoft Daten auch außerhalb der EU verarbeiten, insbesondere in den USA; dafür gelten die Standardvertragsklauseln der EU-Kommission (Art. 46 DSGVO). Muster versenden wir mit einem Paketdienst, der dafür Ihren Namen und Ihre Anschrift erhält. An andere geben wir Ihre Daten nicht weiter.',
+      b6alt: 'Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung und Datenübertragbarkeit.',
+      b6: 'Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (siehe „Ihr Widerspruchsrecht“).',
+      vorB1: '<p><b>Nachweis:</b>'
+    },
+    en: {
+      titel: 'Privacy notice on the newsletter, contact from our sales team and your enquiry at our stand',
+      b1: '<p><b>Your enquiry at our stand:</b> If you talk to our stand team, they note your enquiry in this app: your contact details (taken from your business card if you wish), your postal address if you would like samples, your interests and details of your requirements (for example products, quantities, timing, current supplier), which quotations, samples or documents you would like, whether you would like us to call you back, a short note of the conversation, our assessment of your requirements and who looked after you. We use these details to send you what you asked for, to contact you about it and to evaluate internally which products were in demand at the trade fair. The legal basis is our legitimate interest in dealing with your enquiry and winning you as a customer (Article 6(1)(f) GDPR); if you are enquiring for your own business, also taking steps at your request prior to entering into a contract (Article 6(1)(b) GDPR). We only send you advertising by email beyond your enquiry if you tick the box “Contact from our sales team”. Providing these details is voluntary; without them we cannot send you a quotation or samples. Until they are passed on, the details remain encrypted on the tablet; our stand team passes them on to our sales team by email and then deletes them from the tablet. Only the responsible Süsse staff receive these details. If your enquiry does not lead to business, we delete them twelve months after our last contact. If you place an order, the statutory retention periods apply to quotations, orders and invoices.</p>',
+      b2: '<p class="ds-kasten"><b>Your right to object:</b> <b>You can object to the use of your details for advertising at any time, without giving reasons</b> – informally, for example by replying briefly to an email from our sales team or by calling +49 5603 502-0. We will then no longer use your details for advertising. You can also object, on grounds relating to your particular situation, to any other processing based on our legitimate interest (Article 21 GDPR).</p>',
+      b3alt: 'your registration is stored temporarily on the tablet in encrypted form.',
+      b3: 'your registration for the newsletter or for contact from our sales team is stored temporarily on the tablet in encrypted form.',
+      b3endeAlt: 'If the transfer does not succeed within three days, it is deleted.',
+      b3zusatz: 'The note of your enquiry at our stand remains encrypted on the tablet until our stand team passes it on to our sales team by email; it is then deleted from the tablet.',
+      b4: '<p><b>Business card (optional):</b> If you wish, the tablet photographs your own business card and reads the text itself in order to pre-fill the fields; during a conversation, our stand team does this with the card you give them for this purpose. Text recognition runs entirely on the tablet. The photo and the recognised text do not leave the tablet, are held only in its working memory and are discarded immediately. We only take your email address, first name, last name, lab/company/institution/hospital, telephone number and position, and, for an enquiry with a request for samples, also your postal address; we do not take any other details on the card. We never send your telephone number, position or postal address for the newsletter; our sales team only receives your telephone number and position if you tick the second box or as part of your enquiry. The suggested entries are checked before sending and can be changed or deleted. After that, we use the details in the same way as typed-in details (see “Purpose”, “Contact from our sales team” and “Your enquiry at our stand”). The legal basis for reading the card is our legitimate interest in saving the effort of typing (Article 6(1)(f) GDPR).</p>',
+      b5alt: 'We do not pass your data on to anyone else.',
+      b5: 'Our stand team passes the note of your enquiry at our stand on to our sales team by email. Our emails run via Microsoft 365 (Exchange Online); Microsoft acts on our behalf (processing on behalf of a controller under Article 28 GDPR) and stores the data in the EU. In limited cases, for example for operations and security, Microsoft may also process data outside the EU, in particular in the USA; the European Commission\'s standard contractual clauses apply to this (Article 46 GDPR). We send samples with a parcel service, which receives your name and postal address for this purpose. We do not pass your data on to anyone else.',
+      b6alt: 'You have the right of access, rectification, erasure, restriction of processing and data portability.',
+      b6: 'You have the right of access, rectification, erasure, restriction of processing, data portability and objection (see “Your right to object”).',
+      vorB1: '<p><b>Proof of consent:</b>'
+    }
+  };
   window.TEXTE = {
     de: {
       sprachname: 'Deutsch',
@@ -118,7 +150,16 @@
       vkNochmal: 'Bitte tippen Sie noch einmal auf „Eigene Visitenkarte lesen lassen“. Dann öffnet sich die Kamera des Tablets.',
       vkImBrowser: 'Die Kamera lässt sich hier nicht öffnen. Bitte öffnen Sie die Seite im Browser: oben rechts auf die drei Punkte ⋮ tippen, dann „In Chrome öffnen“. Oder tippen Sie Ihre Angaben selbst ein.',
       telefonLabel: 'Telefon (freiwillig, nur für den Vertrieb)',
-      positionLabel: 'Position (freiwillig, nur für den Vertrieb)'
+      positionLabel: 'Position (freiwillig, nur für den Vertrieb)',
+      dsG: DS_G.de,
+      gKurzWeb: 'Wir haben Ihre Anfrage notiert (Kontaktdaten, Bedarf, gewünschte Angebote und Muster, kurze Gesprächsnotiz), um sie zu bearbeiten; sie bleibt verschlüsselt auf dem Tablet, bis unser Standteam sie per E-Mail an unseren Vertrieb übergibt, und wird dann hier gelöscht. <b>Sie können der Nutzung Ihrer Angaben für Werbung jederzeit widersprechen.</b> Mehr dazu im Datenschutzhinweis unten in dieser App und unter www.suesse.de/datenschutz.',
+      gKurzOhne: 'Wir haben Ihre Anfrage notiert (Kontaktdaten, Bedarf, gewünschte Angebote und Muster, kurze Gesprächsnotiz), um sie zu bearbeiten; sie bleibt verschlüsselt auf dem Tablet, bis unser Standteam sie per E-Mail an unseren Vertrieb übergibt, und wird dann hier gelöscht. <b>Sie können der Nutzung Ihrer Angaben für Werbung jederzeit widersprechen.</b> Mehr dazu im Datenschutzhinweis unten in dieser App.',
+      gUeTitel: 'Ihre Anfrage', gUeEw: 'Ihre Anfrage am Messestand', gUeWuensche: 'Wir senden Ihnen bzw. melden uns zu:', gUeKontakt: 'Kontakt:',
+      gUeHaken: 'Möchten Sie mehr von uns? Setzen Sie Ihre Häkchen bitte selbst.',
+      gUeEmailFehlt: 'Für Newsletter und Kontakt durch unseren Vertrieb brauchen wir Ihre E-Mail-Adresse. Bitte geben Sie sie unserem Standteam.',
+      gKnopf: 'Absenden', gZurueckTeam: 'Standteam: zurück',
+      gDanke1: 'Ihre Anfrage ist aufgenommen.', gDankeNr: 'Gesprächs-Nr.',
+      gN_angebot: 'Angebot', gN_muster: 'Muster', gN_rueckruf: 'Rückruf', gN_unterlagen: 'Unterlagen', gN_besuch: 'Besuch', gN_nichts: '–'
     },
     en: {
       sprachname: 'English',
@@ -190,7 +231,16 @@
       vkNochmal: 'Please tap “Read my business card” once more. The tablet’s camera will then open.',
       vkImBrowser: 'The camera cannot be opened here. Please open the page in your browser: tap the three dots ⋮ at the top right, then “Open in Chrome”. Or type in your details yourself.',
       telefonLabel: 'Telephone (optional, sales team only)',
-      positionLabel: 'Position (optional, sales team only)'
+      positionLabel: 'Position (optional, sales team only)',
+      dsG: DS_G.en,
+      gKurzWeb: 'We have noted your enquiry (contact details, requirements, requested quotations and samples, a short note of our conversation) in order to deal with it; it remains encrypted on this tablet until our stand team passes it on to our sales team by email, and is then deleted here. <b>You can object to the use of your details for advertising at any time.</b> More in the privacy notice below in this app and at www.suesse.de/datenschutz.',
+      gKurzOhne: 'We have noted your enquiry (contact details, requirements, requested quotations and samples, a short note of our conversation) in order to deal with it; it remains encrypted on this tablet until our stand team passes it on to our sales team by email, and is then deleted here. <b>You can object to the use of your details for advertising at any time.</b> More in the privacy notice below in this app.',
+      gUeTitel: 'Your enquiry', gUeEw: 'Your enquiry at our stand', gUeWuensche: 'We will send you or contact you about:', gUeKontakt: 'Contact:',
+      gUeHaken: 'Would you like to hear more from us? Please tick the boxes yourself.',
+      gUeEmailFehlt: 'For the newsletter and contact from our sales team we need your email address. Please give it to our stand team.',
+      gKnopf: 'Submit', gZurueckTeam: 'Stand team: back',
+      gDanke1: 'Your enquiry has been recorded.', gDankeNr: 'Reference no.',
+      gN_angebot: 'Quotation', gN_muster: 'Samples', gN_rueckruf: 'Call back', gN_unterlagen: 'Documents', gN_besuch: 'Visit', gN_nichts: '–'
     },
     es: {
       sprachname: 'Español',
@@ -404,5 +454,65 @@
       vkImBrowser: 'De camera kan hier niet worden geopend. Open de pagina in de browser: tik rechtsboven op de drie puntjes ⋮ en dan op „Openen in Chrome”. Of vul uw gegevens zelf in.',
       telefonLabel: 'Telefoon (optioneel, alleen voor de verkoopafdeling)', positionLabel: 'Functie (optioneel, alleen voor de verkoopafdeling)'
     }
+  };
+  window.TEXTE_STAND = {
+    startKnopf: 'Messegespräch aufnehmen',
+    exportKnopf: 'Gespräche an den Vertrieb senden',
+    startHinweis: 'Für das Standteam:',
+    gespeichertEins: 'Gespräch auf diesem Tablet gespeichert', gespeichertMehr: 'Gespräche auf diesem Tablet gespeichert',
+    warnung72: 'Achtung: Das älteste Gespräch ist älter als 72 Stunden. Bitte jetzt an den Vertrieb senden.',
+    warnungKurz: 'älter als 72 Stunden, bitte senden',
+    pinNeuTitel: 'Messe-PIN festlegen',
+    pinNeuText: 'Einmal je Messe: Das Standteam legt eine Messe-PIN fest (mindestens 6 Ziffern, nicht die Geräte-PIN). Sie schützt „Gespräche an den Vertrieb senden“ und den Weg zurück von der Besucherseite. Auf dem Tablet steht sie nur als Prüfwert, nicht im Klartext. Bitte nicht aufschreiben, wo Besucher sie sehen.',
+    pin1: 'Messe-PIN', pin2: 'Messe-PIN wiederholen', pinNeuOk: 'PIN festlegen und weiter',
+    pinRegel: 'Die Messe-PIN braucht mindestens 6 Ziffern (nur Ziffern).',
+    pinUngleich: 'Die beiden Eingaben sind nicht gleich.',
+    pinFrageExport: 'Gespräche an den Vertrieb senden: bitte Messe-PIN eingeben.',
+    pinFrageZurueck: 'Nur Standteam: Messe-PIN eingeben, um zum Gespräch zurückzugehen.',
+    pinFalsch: 'PIN falsch.',
+    pinOk: 'Weiter', pinAbbrechen: 'Abbrechen', pinVergessen: 'PIN vergessen?',
+    pinVergessenFrage: 'PIN vergessen: Dann werden ALLE auf diesem Tablet gespeicherten Gespräche gelöscht (sonst käme jeder mit einer neuen PIN an sie heran). Danach eine neue PIN festlegen. Fortfahren?',
+    speichernFehler: 'Das Gespräch konnte auf diesem Tablet nicht gespeichert werden. Bitte die Angaben auf Papier notieren.',
+    exportTitel: 'Gespräche an den Vertrieb senden',
+    exportText: 'Die App erstellt eine Datei für Excel (eine Zeile je Gespräch, keine Newsletter-Anmeldungen) und öffnet das Teilen-Menü. Dort die Mail-App wählen, als Empfänger eintragen:',
+    exportAnzahl: 'Gespräche zum Senden:',
+    exportDatei: 'Datei erstellen und teilen',
+    exportFrage: 'Ist die Mail mit der Datei gesendet?',
+    exportJa: 'Ja, gesendet – Gespräche vom Tablet löschen', exportNein: 'Noch nicht',
+    exportGeteilt: 'Teilen-Menü geöffnet. Nach dem Senden: gesendete Mail im Mail-Programm löschen, dann hier bestätigen.',
+    exportHeruntergeladen: 'Teilen mit Datei geht hier nicht: Die Datei wurde in „Downloads“ gespeichert und ein Mail-Entwurf geöffnet. Datei an die Mail anhängen, senden, dann die Datei in „Downloads“ und die gesendete Mail löschen. Danach hier bestätigen.',
+    exportAbgebrochen: 'Teilen abgebrochen. Es wurde nichts gesendet und nichts gelöscht.',
+    exportGeloescht: 'vom Tablet gelöscht.',
+    exportNochNicht: 'Nichts gelöscht. Die Gespräche bleiben verschlüsselt gespeichert.',
+    exportRegel: 'Danach prüfen: Zahl der gespeicherten Gespräche ist 0, in „Downloads“ liegt keine Datei, die gesendete Mail ist im Mail-Programm gelöscht.',
+    sp_nr: 'Nr.', sp_zeit: 'Zeit', sp_einr: 'Einrichtung', sp_bew: 'Bewertung', sp_schritt: 'Nächster Schritt',
+    testmarke: 'TESTMODUS – Datei mit Testdaten, Betreff beginnt mit „TEST“.',
+    zurueckStart: '‹ Zur Startseite',
+    titel: 'Messegespräch',
+    schritt1: '1 Kontakt', schritt2: '2 Interesse und Wünsche', schritt3: '3 Einschätzung und Notiz',
+    abbrechen: 'Verwerfen', weiter: 'Weiter ›', zurueck: '‹ Zurück', uebergeben: 'An Besucher übergeben ›',
+    pflicht: 'Pflicht',
+    vkKnopf: 'Visitenkarte des Besuchers lesen',
+    vkHinweis: 'Nur mit Ja des Besuchers zu seiner eigenen Karte: „Darf ich Ihre Karte kurz abfotografieren?“ Nie Karten aus dem Glas, von Kollegen oder von Abwesenden. Das Foto wird nicht gespeichert.',
+    vkAnleitung: 'Visitenkarte des Besuchers so in den Rahmen halten, dass sie ihn gut ausfüllt.',
+    email: 'E-Mail-Adresse', telefon: 'Telefon', vorname: 'Vorname', nachname: 'Nachname', position: 'Position',
+    emailOderTelefon: 'E-Mail oder Telefon ist Pflicht.',
+    einrichtung: 'Labor / Firma / Einrichtung / Klinik', einrichtungstyp: 'Einrichtungstyp', land: 'Land',
+    produkte: 'Produktinteresse', mehrere: '(mehrere möglich)',
+    chemieHinweis: 'Muster bei Chemikalien, Formalin Gefäßen und Färbesystemen nur nach Rücksprache Innendienst (Gefahrstoff, Ethanol nur Strecke).',
+    naechster: 'Nächster Schritt',
+    angebot: 'Angebotswunsch (Artikel, Menge, Besonderheiten)',
+    muster: 'Musterwunsch (Artikel, Anzahl, am Stand mitgegeben?)',
+    anschrift: 'Musteranschrift (Empfänger, Straße, PLZ, Ort, Land)',
+    anschriftHinweis: 'Nur bei Musterwunsch. Ohne Muster wird die Anschrift nicht übernommen.',
+    bewertung: 'Bewertung',
+    b_heiss: 'heiß – konkreter Bedarf, Angebot/Muster, Kauf in 3 Monaten', b_warm: 'warm – Interesse, Entscheidung später', b_kalt: 'kalt – nur Information',
+    von: 'Aufgenommen von',
+    notiz: 'Messegespräch',
+    notizHinweis: 'Nur Geschäftliches notieren – keine Gesundheits-, Patienten- oder Privatangaben, keine Wertungen über die Person; der Besucher kann diese Notiz im Wortlaut anfordern.',
+    notizRegel: 'Fertig schreiben, dann übergeben. Nach dem Absenden ist das Gespräch auf dem Bildschirm weg; es bleibt verschlüsselt gespeichert bis „Gespräche an den Vertrieb senden“. Nachträge danach bei Frau Fern.',
+    zeichen: 'Zeichen',
+    fehlt: 'Bitte noch ausfüllen:',
+    testzeile: 'TESTMODUS – nur Testdaten eingeben. Gespräche werden in einer eigenen Test-Ablage gespeichert.'
   };
 })();
