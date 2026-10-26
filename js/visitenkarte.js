@@ -35,7 +35,8 @@
     do {
       alt = w.length;
       if (w.length > 1 && !/[A-Za-z0-9ÄÖÜäöüßÀ-ÿ]/.test(w[0]) && !/^[+(]/.test(w[0])) w.shift();
-      else if (w.length > 1 && /^[A-Za-zÀ-ÿ]$/.test(w[0]) && !/^[TMFPEWtmfpew]$/.test(w[0]) && /^(\+|\(|\d|www\.|\S+@)/i.test(w[1])) w.shift();
+      else if (w.length > 1 && /^[A-Za-zÀ-ÿ]$/.test(w[0]) && !/^[TMFPEWtmfpew]$/.test(w[0]) && /^(\+|\(|\d|www\.|\S+@)/i.test(w[1]) &&
+        !(/^[a-zß-ÿ]$/.test(w[0]) && /@/.test(w[1]))) w.shift();
     } while (w.length < alt);
     return w.join(' ');
   }
@@ -70,30 +71,57 @@
   }
   var ENDUNG_LANG = /^(example|museum|agency|company|digital|online|solutions|services|systems|network|technology|international|consulting|management|clinic|dental|academy|training|software|science|berlin|hamburg|koeln|cologne|bayern|saarland|tirol|vlaanderen|brussels|amsterdam|london|paris|madrid|barcelona|zuerich)$/;
   var FREEMAIL = /^(gmail|googlemail|gmx|web|yahoo|outlook|hotmail|live|msn|icloud|me|aol|tonline|freenet|posteo|mailbox|protonmail|proton|arcor|vodafone|ionos|email|mail)$/;
-  function emailFinden(text) {
-    var kand = [];
-    String(text || '').split('\n').forEach(function (z) {
-      z = z.replace(/[ \t]*[\(\[][ \t]*at[ \t]*[\)\]][ \t]*/gi, '@')
+  var EMAIL_ETIKETT = /^(e-?mail|email|mail|e)$/i;
+  var EMAIL_NACH = /^($|[\s,;:.!?)\]}>»"'’|·•\/])/;
+  function emailPruefen(text) {
+    var kand = [], verworfen = 0, ganz = String(text || '');
+    ganz.split('\n').forEach(function (zeile) {
+      var z = zeile.replace(/[ \t]*[\(\[][ \t]*at[ \t]*[\)\]][ \t]*/gi, '@')
         .replace(/([A-Za-z0-9])[ \t]*[©®][ \t]*([A-Za-z0-9])/g, '$1@$2')
         .replace(/[ \t]*@[ \t]*/g, '@');
       if (z.indexOf('@') >= 0) z = z.replace(/(\w)[ \t]+\.[ \t]*(?=\w)|(\w)[ \t]*\.[ \t]+(?=\w)/g, function (m, a, b) { return (a || b) + '.'; });
-      (z.match(/[A-Za-z0-9._%+\-]+(?:@[A-Za-z0-9._%+\-]+)+/g) || []).forEach(function (tok) {
-        var p = tok.split('@');
+      var re = /[A-Za-z0-9._%+\-]+(?:@[A-Za-z0-9._%+\-]+)+/g, t;
+      while ((t = re.exec(z))) {
+        var tok = t[0], vorher = z.slice(0, t.index), danach = z.slice(t.index + tok.length);
+        var klebt = (vorher.match(/\S*$/) || [''])[0];
+        var vor = vorher.match(/(\S+)(\s+)$/), vorneOk = true;
+        if (klebt) {
+          var etikett = /:$/.test(klebt) && EMAIL_ETIKETT.test(klebt.replace(/:$/, ''));
+          if (/[A-Za-z0-9À-ÿ]/.test(klebt) && !etikett) vorneOk = false;
+        } else if (vor) {
+          var spalteDavor = vor[2].replace(/\t/g, '   ').length >= 3;
+          var stueck = spalteDavor ? vorher.replace(/\s+$/, '').split(/ {3,}|\t/).pop() : vor[1];
+          if ((spalteDavor ? /^[a-zß-ÿ]{1,3}$/ : /^[a-zß-ÿ]{1,6}$/).test(stueck) && !EMAIL_ETIKETT.test(stueck)) vorneOk = false;
+        }
+        var p = tok.split('@'), letzte = p.length - 1;
         for (var i = 1; i < p.length; i++) {
-          var lokal = p[i - 1].replace(/^[._\-]+|[._\-]+$/g, '');
-          var m = p[i].replace(/^[._\-]+/, '').toLowerCase().match(/^((?:[a-z0-9\-]+\.)+([a-z]{2,}))/);
+          var roh = p[i - 1];
+          var lokal = roh.replace(/^[._\-]+|[._\-]+$/g, '');
+          var dom = p[i].replace(/^[._\-]+/, '').toLowerCase();
+          var m = dom.match(/^((?:[a-z0-9\-]+\.)+([a-z]{2,}))/);
           if (!lokal || !m) continue;
           if (m[2].length > 6 && !ENDUNG_LANG.test(m[2])) continue;
+          if (i < letzte) continue;
+          var ok = /^[._\-]/.test(roh) ? false : i === 1 ? vorneOk : !/[A-Za-zÀ-ÿ]/.test(p[i - 2]);
+          if (ok && dom.slice(m[1].length).replace(/[._\-]+$/, '')) ok = false;
+          if (ok && !EMAIL_NACH.test(danach)) ok = false;
+          if (!ok) { if (/[a-z]/i.test(lokal)) verworfen++; continue; }
           kand.push((lokal + '@' + m[1]).toLowerCase());
         }
-      });
+      }
     });
-    if (!kand.length) return '';
     var gut = kand.filter(function (e) { return /[a-z]/.test(e.split('@')[0]); });
     if (gut.length) kand = gut;
     var persoenlich = kand.filter(function (e) { return !ALLGEMEIN.test(e.split('@')[0]); });
-    return (persoenlich[0] || kand[0]);
+    if (persoenlich.length) return { email: persoenlich[0], verworfen: verworfen };
+    if (!kand.length) return { email: '', verworfen: verworfen };
+    var domain = kand[0].split('@')[1];
+    var rest = (ganz.toLowerCase().match(/(^|\s)[a-z0-9\-]+(\.[a-z0-9\-]+)*\.[a-z]{2,}(?=$|[\s,;])/gm) || [])
+      .some(function (x) { return x.trim() === domain; });
+    if (verworfen || rest) return { email: '', verworfen: verworfen + (rest ? 1 : 0) };
+    return { email: kand[0], verworfen: 0 };
   }
+  function emailFinden(text) { return emailPruefen(text).email; }
   function domainName(email) {
     var d = umlautFrei(((email || '').split('@')[1] || '').split('.')[0] || '');
     return d.length >= 4 && !FREEMAIL.test(d) ? firmenSchluessel(d) : '';
@@ -136,7 +164,9 @@
   function auswerten(text, mitTelPos) {
     var z = zerlegen(text), f = { email: '', vorname: '', nachname: '', einrichtung: '' };
     if (mitTelPos) { f.telefon = ''; f.position = ''; }
-    f.email = emailFinden(z.map(function (x) { return x.zeile; }).join('\n'));
+    var ep = emailPruefen(z.map(function (x) { return x.zeile; }).join('\n'));
+    f.email = ep.email;
+    f.emailVerworfen = ep.verworfen > 0;
     var ePlain = umlautFrei((f.email.split('@')[0] || ''));
     var firma = domainName(f.email);
     var bester = null, besterWert = -99;
@@ -154,6 +184,12 @@
         if (wert > besterWert) { besterWert = wert; bester = n; }
       });
     });
+    if (bester && f.email) {
+      var lt = f.email.split('@')[0].split(/[._\-]/), vnS = umlautFrei(bester.vorname.split(' ')[0]), nnS = umlautFrei(bester.nachname).replace(/-/g, '');
+      var a = lt[0].replace(/^[^a-z]+/, ''), b = umlautFrei(lt.slice(1).join(''));
+      if (lt.length > 1 && a && b && nnS.length > 1 && b.indexOf(nnS) === 0 && vnS.length > a.length &&
+        vnS.slice(-a.length) === a && vnS.indexOf(a) !== 0) { f.email = ''; f.emailVerworfen = true; }
+    }
     if (!bester && f.email) bester = nameAusEmail(f.email);
     if (bester) { f.vorname = bester.vorname; f.nachname = bester.nachname; }
     var einr = '', einrWert = 0;
@@ -364,12 +400,12 @@
           r = null;
           var spaltenText = tsv ? textAusTsv(tsv) : '';
           var f = auswerten(spaltenText || text, mitTelPos);
-          if (spaltenText && !f.email) { var f2 = auswerten(text, mitTelPos); if (f2.email) { f = f2; spaltenText = ''; } }
+          if (spaltenText && !f.email && !f.emailVerworfen) { var f2 = auswerten(text, mitTelPos); if (f2.email) { f = f2; spaltenText = ''; } }
           if (o.rohtext) roh = spaltenText || text;
           text = null; tsv = null; spaltenText = null;
           if (i > 0) verwerfen(c);
-          if (!bestes || f.punkte > bestes.punkte) bestes = f;
-          if (f.email || f.punkte >= 3) return bestes;
+          if (!bestes || f.punkte > bestes.punkte || f.emailVerworfen) bestes = f;
+          if (f.email || f.punkte >= 3 || f.emailVerworfen) return bestes;
           return naechste(i + 1);
         });
       }

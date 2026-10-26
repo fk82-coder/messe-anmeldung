@@ -89,6 +89,7 @@
     document.querySelectorAll('.formular-inhalt, .spalte-angaben, .spalte-einwilligung, .einw-rollen').forEach(function (s) { s.scrollTop = 0; });
     $('f_haken').checked = false;
     $('emailFehler').classList.remove('an');
+    emailMarkeWeg();
     $('testUebertragung').innerHTML = ''; $('testUebertragung').classList.remove('an');
     datenschutz(false);
     pruefen();
@@ -376,7 +377,22 @@
     if (!n) vkMeldung(text('vkSchlecht'), true);
     else if (!f.email) vkMeldung(text('vkOhneEmail'), true);
     else vkMeldung(text('vkPruefen'));
+    emailMarkieren();
   }
+  function emailMarkieren() {
+    var e = $('f_email');
+    if (e.value && !e.classList.contains('vorschlag')) { emailMarkeWeg(); return; }
+    e.classList.add('pruefen');
+    var h = $('emailPruefen'), k = e.value ? 'vkEmailPruefen' : 'vkEmailEintippen';
+    h.setAttribute('data-t', k);
+    h.textContent = text(k);
+    h.classList.add('an');
+  }
+  function emailMarkeWeg() {
+    var h = $('emailPruefen');
+    $('f_email').classList.remove('pruefen'); h.classList.remove('an'); h.removeAttribute('data-t'); h.textContent = '';
+  }
+  $('f_email').addEventListener('input', emailMarkeWeg);
   Object.keys(VK_ZIELE).forEach(function (k) { $(VK_ZIELE[k]).addEventListener('input', function () { this.classList.remove('vorschlag'); }); });
   function zaehlerZeigen() {
     return S.anzahl().then(function (n) {
@@ -492,7 +508,8 @@
     if (q.vk === 'liest') $('vkLesen').classList.add('an');
     if (q.vk === 'schlecht') vkMeldung(text('vkSchlecht'), true);
     if (q.vk === 'vorschlag') vkUebernehmen({ email: 'max.muster@example.com', vorname: 'Max', nachname: 'Muster', einrichtung: 'Tierklinik Beispielstadt GmbH', telefon: '+49 5603 000-12', position: 'Fachtierarzt für Pathologie · Leitung Labor' });
-    if (q.vk === 'echt' && /^karte-[\w-]+\.jpg$/.test(q.bild || '')) {
+    if (q.vk === 'ohneemail') vkUebernehmen({ email: '', vorname: 'Max', nachname: 'Muster', einrichtung: 'Tierklinik Beispielstadt GmbH', telefon: '+49 5603 000-12', position: 'Fachtierarzt für Pathologie · Leitung Labor' });
+    if (q.vk === 'echt' &&/^karte-[\w-]+\.jpg$/.test(q.bild || '')) {
       VK.vorwaermen().catch(function () { });
       fetch('test/karten/' + q.bild).then(function (r) { return r.blob(); }).then(VK.ausDatei).then(vkLesen, function () { vkMeldung(text('vkSchlecht'), true); });
     }

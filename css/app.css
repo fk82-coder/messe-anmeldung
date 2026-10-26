@@ -82,6 +82,9 @@ input[type=text]:focus, input[type=email]:focus { border: 2.5px solid var(--blau
 input.ok { border-color: var(--ok); }
 .fehlertext { color: var(--alarm); font-size: .75em; font-weight: 700; visibility: hidden; }
 .fehlertext.an { visibility: visible; }
+#f_email.pruefen, #f_email.pruefen:focus { border: 3px solid var(--knopf); box-shadow: 0 0 0 3px var(--kupferrand); padding: 0 calc(.6em - 1.5px); }
+.email-pruefen { display: none; color: var(--kupfertext); background: var(--kupferhell); border-left: 4px solid var(--kupfer); border-radius: 3px; padding: .2em .5em; font-size: .78em; font-weight: 700; line-height: 1.35; }
+.email-pruefen.an { display: block; }
 .chips { display: flex; flex-wrap: wrap; gap: .45em; }
 .chip { border: 1.5px solid #9aa3b1; background: #fff; border-radius: 4px; padding: .3em .7em; min-height: 44px; cursor: pointer; color: var(--text); font-size: .82em; }
 .chip.an { border-color: var(--blau); background: var(--blau); color: #fff; }
@@ -183,6 +186,22 @@ input[type=tel].vorschlag { background: #DCEBFD; border-color: #5B8FD6; }
   .formular-inhalt .spalte-einwilligung { overflow: hidden; min-height: 0; gap: 0; }
   .formular-inhalt .einw-rollen { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding-right: .3em; }
   .formular-inhalt .knopfleiste { position: static; flex: 0 0 auto; }
+}
+@media (min-width: 760px) {
+  .spalte-einwilligung .einw-rollen { gap: .35em; }
+  .spalte-einwilligung .karte { padding: .5em .85em .3em; }
+  .spalte-einwilligung .eyebrow { font-size: .6em; letter-spacing: .07em; margin-bottom: .35em; }
+  .spalte-einwilligung .haken { font-size: max(15px, .76em); line-height: 1.33; gap: .6em; margin-bottom: .15em; min-height: 44px; }
+  .spalte-einwilligung .klein { font-size: .7em; margin-bottom: .1em; }
+  .spalte-einwilligung .link { font-size: .78em; min-height: 44px; padding: 0; }
+  .spalte-einwilligung .telpos { gap: .3em .7em; margin-top: .15em; padding-top: .45em; }
+  .spalte-einwilligung .telpos.an { flex-direction: row; align-items: flex-end; }
+  .spalte-einwilligung .telpos .feld { gap: .15em; flex: 1 1 0; }
+  .spalte-einwilligung .telpos label { font-size: .7em; }
+  .spalte-einwilligung input[type=tel], .spalte-einwilligung .telpos input[type=text] { font-size: .85em; }
+  .spalte-einwilligung .entwurfmarke { margin-bottom: .45em; }
+  .spalte-einwilligung .knopfleiste { padding-top: .35em; padding-bottom: .4em; }
+  .spalte-einwilligung .unter-knopf { font-size: .7em; margin-top: .25em; line-height: 1.3; }
 }
 @media (max-width: 759.98px) {
   .inhalt { padding: .8em .9em; gap: 1em; }
