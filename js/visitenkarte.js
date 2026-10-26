@@ -25,6 +25,9 @@
   var FAX = /(fax|telefax|\bF\b\s*[:.]?\s*\+?\d)/i;
   var TELEFON_ZEICHEN = /(tel|fon|phone|telefon|mobil|mobile|handy|cell|\bT\b|\bM\b|\bP\b)\s*[.:]?\s*\+?\(?\d/i;
   var NUMMER = /\+?\(?\d[\d\s()\/.\-–]{5,}\d/;
+  var MOBIL_ETIKETT = /(mobil\w*|handy|cell\w*|\bmob\b\.?|\bM\b)(\s*(phone|tel\.?|telefon|nr\.?|no\.?))?[\s.:]*$/i;
+  var FEST_ETIKETT = /(tel\.?|telefon|phone|fon|\bT\b|\bP\b)[\s.:]*$/i;
+  var TEL_TEILE = /\s+[·•|∙◦]\s+|\s{2,}|(?=\b(?:Tel|Fon|Phone|Telefon|Mobil|Mobile|Handy|Fax|T|M|F)\b\.?\s*:?\s*\+?\d)/i;
   var ALLGEMEIN = /^(info|kontakt|contact|office|mail|email|service|sales|vertrieb|labor|lab|empfang|praxis|team|hello|hallo|admin|post|zentrale|anfrage|bestellung|order|einkauf|purchasing)$/i;
   function ziffern(s) { return (s.match(/\d/g) || []).length; }
   function umlautFrei(s) { return s.toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').replace(/[^a-z]/g, ''); }
@@ -127,6 +130,12 @@
     return d.length >= 4 && !FREEMAIL.test(d) ? firmenSchluessel(d) : '';
   }
   function firmenSchluessel(s) { return umlautFrei(s).replace(/ue|ii|ti|li|il/g, 'u'); }
+  function nurZiffern(s) { return String(s || '').replace(/\D/g, ''); }
+  function istMobilnummer(n) {
+    var d = String(n || '').replace(/\(0\)/g, '').replace(/[^\d+]/g, '').replace(/^00/, '+').replace(/^\+(3[1349]|4[1349])0/, '+$1');
+    return /^(\+49|0)1[5-7]\d/.test(d) || /^\+436[5-9]\d/.test(d) || /^\+417[5-9]\d/.test(d) || /^\+447[1-9]\d/.test(d) ||
+      /^\+316\d/.test(d) || /^\+33[67]\d/.test(d) || /^\+393\d/.test(d) || /^\+34[67]\d/.test(d);
+  }
   function istTelefon(s) { return ziffern(s) >= 7 && (TELEFON_ZEICHEN.test(s) || /^\+?\(?\d[\d\s()\/.\-–]+$/.test(s)); }
   function istAnschrift(s) { return ANSCHRIFT_PLZ.test(s) || (ANSCHRIFT_STRASSE.test(s) && /\d/.test(s)) || UK_POSTLEITZAHL.test(s) || /^\d+[a-z]?\s+\w+\s+(road|street|avenue|lane)/i.test(s); }
   function istWeb(s) { return s.indexOf('@') < 0 && WEB.test(s); }
@@ -163,7 +172,7 @@
   function aufraeumen(s) { return s.replace(/^[\s.,;:·•|\-–]+|[\s,;:·•|\-–]+$/g, '').replace(/\s+/g, ' ').trim(); }
   function auswerten(text, mitTelPos) {
     var z = zerlegen(text), f = { email: '', vorname: '', nachname: '', einrichtung: '' };
-    if (mitTelPos) { f.telefon = ''; f.position = ''; }
+    if (mitTelPos) { f.telefon = ''; f.mobil = ''; f.position = ''; }
     var ep = emailPruefen(z.map(function (x) { return x.zeile; }).join('\n'));
     f.email = ep.email;
     f.emailVerworfen = ep.verworfen > 0;
@@ -190,6 +199,17 @@
       if (lt.length > 1 && a && b && nnS.length > 1 && b.indexOf(nnS) === 0 && vnS.length > a.length &&
         vnS.slice(-a.length) === a && vnS.indexOf(a) !== 0) { f.email = ''; f.emailVerworfen = true; }
     }
+    if (bester && f.email) {
+      var lokalS = umlautFrei(f.email.split('@')[0]), vnG = umlautFrei(bester.vorname.split(' ')[0]);
+      var nnTeile = bester.nachname.split(/[\s\-]+/).map(umlautFrei).filter(Boolean), nnG = nnTeile.join(''), ganz = vnG + nnG;
+      if (lokalS && vnG.length > 1 && nnG.length > 1) {
+        var nachnamen = nnTeile.map(function (x, i) { return nnTeile.slice(i).join(''); });
+        var rest = lokalS.length < ganz.length && ganz.slice(-lokalS.length) === lokalS && nachnamen.indexOf(lokalS) < 0;
+        var vnRest = lokalS.length < vnG.length && vnG.slice(-lokalS.length) === lokalS;
+        var kurz = lokalS.length <= 2 && [vnG[0], nnG[0], vnG[0] + nnG[0], nnG[0] + vnG[0]].indexOf(lokalS) < 0;
+        if (rest || vnRest || kurz) { f.email = ''; f.emailVerworfen = true; }
+      }
+    }
     if (!bester && f.email) bester = nameAusEmail(f.email);
     if (bester) { f.vorname = bester.vorname; f.nachname = bester.nachname; }
     var einr = '', einrWert = 0;
@@ -213,19 +233,25 @@
     });
     f.einrichtung = einr ? aufraeumen(schoenSchreiben(einr)) : '';
     if (mitTelPos) {
-      z.some(function (x) {
-        return x.spalten.some(function (s) {
-          return s.split(/\s+[·•|∙◦]\s+|\s{2,}|(?=\b(?:Tel|Fon|Phone|Telefon|Mobil|Mobile|Handy|Fax|T|M|F)\b\.?\s*:?\s*\+?\d)/i).some(function (t) {
-            if (FAX.test(t) || t.indexOf('@') >= 0 || istAnschrift(t) && !TELEFON_ZEICHEN.test(t)) return false;
-            if (ziffern(t) < 7) return false;
+      var nummern = [];
+      z.forEach(function (x) {
+        x.spalten.forEach(function (s) {
+          s.split(TEL_TEILE).forEach(function (t) {
+            if (!t || FAX.test(t) || t.indexOf('@') >= 0 || istAnschrift(t) && !TELEFON_ZEICHEN.test(t)) return;
+            if (ziffern(t) < 7) return;
             var m = t.match(NUMMER);
-            if (!m) return false;
+            if (!m) return;
             var nummer = m[0].replace(/[\s.\-–]+$/, '').trim();
-            if (ziffern(nummer) < 7) return false;
-            f.telefon = nummer; return true;
+            if (ziffern(nummer) < 7) return;
+            var vor = t.slice(0, m.index);
+            var art = MOBIL_ETIKETT.test(vor) ? 'mobil' : FEST_ETIKETT.test(vor) ? 'fest' : (istMobilnummer(nummer) ? 'mobil' : 'fest');
+            nummern.push({ nummer: nummer, art: art });
           });
         });
       });
+      var fest = nummern.filter(function (n) { return n.art === 'fest'; })[0], mob = nummern.filter(function (n) { return n.art === 'mobil'; })[0];
+      f.telefon = fest ? fest.nummer : (mob ? mob.nummer : '');
+      f.mobil = fest && mob && nurZiffern(fest.nummer) !== nurZiffern(mob.nummer) ? mob.nummer : '';
       z.some(function (x) {
         return x.spalten.some(function (t) {
           if (istAusschluss(t) || RECHTSFORM.test(t) || !POSITION.test(t)) return false;
@@ -338,6 +364,158 @@
     }
     return zeichnen(video, vw, vh, a);
   }
+  function schwelle() { return +einst().schaerfeSchwelle || 80; }
+  function aufnahmeMs() { return +einst().aufnahmeMs || 1500; }
+  function rahmenBereich(video, rahmen) {
+    var vw = video.videoWidth, vh = video.videoHeight;
+    var ev = video.getBoundingClientRect(), er = rahmen.getBoundingClientRect();
+    var m = Math.max(ev.width / vw, ev.height / vh), ox = (ev.width - vw * m) / 2, oy = (ev.height - vh * m) / 2;
+    var x = Math.max(0, (er.left - ev.left - ox) / m), y = Math.max(0, (er.top - ev.top - oy) / m);
+    return { x: x, y: y, b: Math.max(8, Math.min(vw - x, er.width / m)), h: Math.max(8, Math.min(vh - y, er.height / m)) };
+  }
+  function streifenBereich(video, rahmen) {
+    var vw = video.videoWidth, vh = video.videoHeight;
+    var ev = video.getBoundingClientRect(), er = rahmen.getBoundingClientRect();
+    var m = Math.max(ev.width / vw, ev.height / vh), oy = (ev.height - vh * m) / 2;
+    var rand = ev.height > ev.width ? 0.5 : 0.2;
+    var y = (er.top - ev.top - oy) / m, h = er.height / m;
+    y -= h * rand; h *= 1 + 2 * rand;
+    y = Math.max(0, y); h = Math.min(vh - y, h);
+    return { x: 0, y: y, b: vw, h: h };
+  }
+  var SCHAERFE_BREITE = 800;
+  function schaerfeMessen(quelle, a, lw) {
+    var sb = SCHAERFE_BREITE, sh = Math.max(8, Math.round(sb * a.h / a.b));
+    if (lw.width !== sb || lw.height !== sh) { lw.width = sb; lw.height = sh; }
+    var ctx = lw.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(quelle, a.x, a.y, a.b, a.h, 0, 0, sb, sh);
+    var p = ctx.getImageData(0, 0, sb, sh).data, n = sb * sh, g = new Float32Array(n), i, x, y, j, L, su = 0, sq = 0, k = 0;
+    for (i = 0; i < n; i++) g[i] = p[i * 4] * 0.299 + p[i * 4 + 1] * 0.587 + p[i * 4 + 2] * 0.114;
+    for (y = 1; y < sh - 1; y++) for (x = 1; x < sb - 1; x++) {
+      j = y * sb + x; L = g[j - 1] + g[j + 1] + g[j - sb] + g[j + sb] - 4 * g[j]; su += L; sq += L * L; k++;
+    }
+    return k ? sq / k - (su / k) * (su / k) : 0;
+  }
+  var liveLw = null;
+  function schaerfeLive(video, rahmen) {
+    if (!video.videoWidth || !video.videoHeight) return 0;
+    if (!liveLw) liveLw = leinwand(SCHAERFE_BREITE, 8);
+    return schaerfeMessen(video, rahmenBereich(video, rahmen), liveLw);
+  }
+  function liveEnde() { verwerfen(liveLw); liveLw = null; }
+  function besteAufnahme(video, rahmen, opt) {
+    opt = opt || {};
+    var vw = video.videoWidth, vh = video.videoHeight;
+    if (!vw || !vh) return Promise.reject(new Error('Kamera liefert kein Bild'));
+    var a = rahmenBereich(video, rahmen), s = streifenBereich(video, rahmen), grenze = schwelle(), dauer = opt.dauerMs || aufnahmeMs();
+    var klein = leinwand(SCHAERFE_BREITE, 8), arbeit = leinwand(vw, vh), beste = leinwand(vw, vh);
+    var besterWert = -1, kleinster = Infinity, n = 0, start = Date.now();
+    return new Promise(function (ok, fehler) {
+      function ende(ergebnis, f) {
+        verwerfen(klein); verwerfen(arbeit);
+        if (f) { verwerfen(beste); fehler(f); return; }
+        if (!ergebnis) { verwerfen(beste); ok(null); return; }
+        ok({ bild: beste, wert: Math.round(besterWert), schwelle: grenze, scharf: besterWert >= grenze, bilder: n,
+          kleinster: Math.round(kleinster), ms: Date.now() - start, video: vw + '×' + vh, rahmen: a, streifen: s });
+      }
+      function schritt() {
+        if (opt.abbrechen && opt.abbrechen()) { ende(false); return; }
+        try {
+          if (video.videoWidth !== vw || video.videoHeight !== vh) { if (n) { ende(true); return; } throw new Error('Kamerabild geändert'); }
+          arbeit.getContext('2d').drawImage(video, 0, 0, vw, vh);
+          var w = schaerfeMessen(arbeit, a, klein); n++;
+          if (w < kleinster) kleinster = w;
+          if (w > besterWert) { besterWert = w; var t = beste; beste = arbeit; arbeit = t; }
+          if (opt.jeBild) opt.jeBild(w, besterWert, grenze);
+        } catch (e) { ende(false, e); return; }
+        var zeit = Date.now() - start;
+        if (zeit >= dauer || (n >= 6 && zeit >= 600 && besterWert >= 2 * grenze)) { ende(true); return; }
+        setTimeout(schritt, 80);
+      }
+      schritt();
+    });
+  }
+  function karteFinden(quelle, qb, qh, ziel) {
+    var B = 480, sk = B / qb, H = Math.max(8, Math.round(qh * sk));
+    var c = leinwand(B, H), ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(quelle, 0, 0, qb, qh, 0, 0, B, H);
+    var p = ctx.getImageData(0, 0, B, H).data, n = B * H, g = new Uint8Array(n), hist = new Float64Array(256), i;
+    verwerfen(c);
+    for (i = 0; i < n; i++) { g[i] = (p[i * 4] * 299 + p[i * 4 + 1] * 587 + p[i * 4 + 2] * 114) / 1000; hist[g[i]]++; }
+    var summe = 0, sB = 0, wB = 0, best = 0, t = 128, v;
+    for (i = 0; i < 256; i++) summe += i * hist[i];
+    for (i = 0; i < 256; i++) {
+      wB += hist[i]; if (!wB) continue;
+      var wF = n - wB; if (!wF) break;
+      sB += i * hist[i];
+      var mB = sB / wB, mF = (summe - sB) / wF; v = wB * wF * (mB - mF) * (mB - mF);
+      if (v > best) { best = v; t = i; }
+    }
+    var lab = new Int32Array(n), stapel = new Int32Array(n), komp = [], nr = 0;
+    var zx0 = (ziel.x + ziel.b * 0.3) * sk, zx1 = (ziel.x + ziel.b * 0.7) * sk, zy0 = (ziel.y + ziel.h * 0.3) * sk, zy1 = (ziel.y + ziel.h * 0.7) * sk;
+    for (i = 0; i < n; i++) {
+      if (g[i] <= t || lab[i]) continue;
+      nr++; var sp = 0, anz = 0, x0 = B, x1 = 0, y0 = H, y1 = 0, mitte = 0;
+      stapel[sp++] = i; lab[i] = nr;
+      while (sp) {
+        var j = stapel[--sp], x = j % B, y = (j - x) / B; anz++;
+        if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+        if (x >= zx0 && x <= zx1 && y >= zy0 && y <= zy1) mitte++;
+        if (x > 0 && g[j - 1] > t && !lab[j - 1]) { lab[j - 1] = nr; stapel[sp++] = j - 1; }
+        if (x < B - 1 && g[j + 1] > t && !lab[j + 1]) { lab[j + 1] = nr; stapel[sp++] = j + 1; }
+        if (y > 0 && g[j - B] > t && !lab[j - B]) { lab[j - B] = nr; stapel[sp++] = j - B; }
+        if (y < H - 1 && g[j + B] > t && !lab[j + B]) { lab[j + B] = nr; stapel[sp++] = j + B; }
+      }
+      komp.push({ nr: nr, anz: anz, x0: x0, x1: x1, y0: y0, y1: y1, mitte: mitte });
+    }
+    var k = komp.filter(function (q) { return q.mitte > 0; }).sort(function (a, b) { return b.anz - a.anz; })[0];
+    g = null; stapel = null;
+    if (!k) return null;
+    var m0 = 0, mx = 0, my = 0, mxx = 0, myy = 0, mxy = 0, y2, xa, xb;
+    function s1(q) { return q * (q + 1) / 2; }
+    function s2(q) { return q * (q + 1) * (2 * q + 1) / 6; }
+    for (y2 = k.y0; y2 <= k.y1; y2++) {
+      xa = -1; xb = -1;
+      for (i = k.x0; i <= k.x1; i++) if (lab[y2 * B + i] === k.nr) { if (xa < 0) xa = i; xb = i; }
+      if (xa < 0) continue;
+      var cnt = xb - xa + 1, sx = s1(xb) - s1(xa - 1), sxx = s2(xb) - s2(xa - 1);
+      m0 += cnt; mx += sx; my += y2 * cnt; mxx += sxx; myy += y2 * y2 * cnt; mxy += y2 * sx;
+    }
+    lab = null;
+    var cx = mx / m0, cy = my / m0, u20 = mxx / m0 - cx * cx, u02 = myy / m0 - cy * cy, u11 = mxy / m0 - cx * cy;
+    var wurzel = Math.sqrt(Math.max(0, (u20 - u02) * (u20 - u02) / 4 + u11 * u11));
+    var l1 = (u20 + u02) / 2 + wurzel, l2 = (u20 + u02) / 2 - wurzel;
+    var lang = Math.sqrt(12 * Math.max(0, l1)), kurz = Math.sqrt(12 * Math.max(0, l2));
+    var theta = 0.5 * Math.atan2(2 * u11, u20 - u02);
+    var info = { anteil: m0 / n, seiten: (lang / Math.max(1, kurz)), fuellung: m0 / Math.max(1, lang * kurz),
+      raender: (k.x0 <= 0 ? 1 : 0) + (k.x1 >= B - 1 ? 1 : 0) + (k.y0 <= 0 ? 1 : 0) + (k.y1 >= H - 1 ? 1 : 0), grad: theta * 180 / Math.PI };
+    var ok = info.anteil >= 0.06 && info.anteil <= 0.92 && info.seiten >= 1.25 && info.seiten <= 2.1 &&
+      info.fuellung >= 0.85 && info.fuellung <= 1.15 && info.raender <= 1;
+    var grad = info.grad, quer = Math.abs(grad) <= 45, dreh = quer ? grad : (grad > 0 ? grad - 90 : grad + 90);
+    if (Math.abs(dreh) > 20) ok = false;
+    if (!ok) return { gefunden: false, info: info };
+    return { gefunden: true, info: info, cx: cx / sk, cy: cy / sk, breite: (quer ? lang : kurz) / sk, hoehe: (quer ? kurz : lang) / sk, dreh: dreh };
+  }
+  function karteZeichnen(quelle, k) {
+    var bw = k.breite * 0.96, bh = k.hoehe * 0.96, g = Math.max(bw, bh), m = Math.min(1, GROESSTE_SEITE / g);
+    if (g < KLEINSTE_SEITE) m = Math.min(2, KLEINSTE_SEITE / g);
+    var c = leinwand(Math.round(bw * m), Math.round(bh * m)), ctx = c.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.translate(c.width / 2, c.height / 2); ctx.scale(m, m);
+    if (Math.abs(k.dreh) >= 1.5) ctx.rotate(-k.dreh * Math.PI / 180);
+    ctx.translate(-k.cx, -k.cy);
+    ctx.drawImage(quelle, 0, 0);
+    return grau(c);
+  }
+  function ausAufnahme(a) {
+    var q = a.bild, k = null, bild;
+    try { k = karteFinden(q, q.width, q.height, a.rahmen); } catch (e) { k = null; }
+    if (k && k.gefunden) bild = karteZeichnen(q, k);
+    else bild = zeichnen(q, q.width, q.height, a.streifen);
+    verwerfen(q); a.bild = null;
+    return { bild: bild, karte: k && k.gefunden ? { breite: Math.round(k.breite), hoehe: Math.round(k.hoehe), dreh: Math.round(k.dreh * 10) / 10 } : null,
+      pruefung: k ? k.info : null, anTexterkennung: bild.width + '×' + bild.height };
+  }
   function inAppBrowser(ua) {
     ua = String(ua || '');
     if (!/Android/i.test(ua)) return false;
@@ -430,6 +608,8 @@
     kameraMoeglich: kameraMoeglich, kameraOeffnen: kameraOeffnen, kameraSchliessen: kameraSchliessen,
     ausVideo: ausVideo, ausDatei: ausDatei, inAppBrowser: inAppBrowser,
     vorwaermen: vorwaermen, erkennen: erkennen, beenden: beenden,
+    schwelle: schwelle, rahmenBereich: rahmenBereich, schaerfeMessen: schaerfeMessen, schaerfeLive: schaerfeLive, liveEnde: liveEnde,
+    besteAufnahme: besteAufnahme, karteFinden: karteFinden, ausAufnahme: ausAufnahme, istMobilnummer: istMobilnummer,
     _verwerfen: verwerfen
   };
 })();

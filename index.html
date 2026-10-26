@@ -33,6 +33,7 @@
         <span class="g-start-info" id="gStartZaehler"></span>
         <span class="g-start-warnung" id="gStartWarnung"></span>
         <button class="link g-namen-link" id="gNamenLos"><span data-gt="namenKnopf"></span> ›</button>
+        <button class="link g-namen-link" id="gTestdatenLos"><span data-gt="tdKnopf"></span> ›</button>
       </div>
       <h1 data-t="titel"></h1>
       <p class="untertitel" data-t="untertitel"></p>
@@ -63,6 +64,7 @@
         <button type="button" class="vk-knopf" id="vkKnopf"><svg class="vk-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-2.5h6L17 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><circle cx="12" cy="13.2" r="3.9" fill="none" stroke="currentColor" stroke-width="1.9"/></svg><span data-t="vkKnopf"></span></button>
         <p class="vk-hinweis" data-t="vkHinweis"></p>
         <p class="vk-meldung" id="vkMeldung" role="status"></p>
+        <div class="vk-pruef" id="vkPruef"></div>
         <input type="file" id="vkDatei" accept="image/*" capture="environment" tabindex="-1" aria-hidden="true">
       </div>
       <div class="feld">
@@ -240,6 +242,25 @@
     </div>
   </main>
 </section>
+<section class="seite" id="gTestdaten">
+  <header class="kopf">
+    <img class="logo klein" src="bilder/logo.png" alt="Süsse Labortechnik">
+    <div class="kopf-mitte g-kopf"><b data-gt="tdTitel"></b></div>
+    <button class="knopf-rand" data-aktion="neu" data-gt="zurueckStart"></button>
+  </header>
+  <main class="inhalt g-einr">
+    <div class="g-einr-spalte">
+      <p class="klein" data-gt="tdText"></p>
+      <table class="g-td-liste"><tbody id="gTdListe"></tbody></table>
+      <div class="g-knoepfe" id="gTdStart"><button class="knopf knopf-blau" id="gTdLoeschen" data-gt="tdLoeschen"></button></div>
+      <div class="g-td-frage" id="gTdFrage">
+        <p data-gt="tdFrage"></p>
+        <div class="g-knoepfe"><button class="knopf-rand" id="gTdNein" data-gt="tdNein"></button><button class="knopf g-td-ja" id="gTdJa" data-gt="tdJa"></button></div>
+      </div>
+      <p class="vk-meldung" id="gTdMeldung" role="status"></p>
+    </div>
+  </main>
+</section>
 <section class="seite" id="gespraech">
   <header class="kopf">
     <img class="logo klein" src="bilder/logo.png" alt="Süsse Labortechnik">
@@ -257,15 +278,22 @@
           <button type="button" class="vk-knopf" id="gVkKnopf"><svg class="vk-symbol" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-2.5h6L17 7h3a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><circle cx="12" cy="13.2" r="3.9" fill="none" stroke="currentColor" stroke-width="1.9"/></svg><span data-gt="vkKnopf"></span></button>
           <p class="vk-hinweis" data-gt="vkHinweis"></p>
           <p class="vk-meldung" id="gVkMeldung" role="status"></p>
+          <div class="vk-pruef" id="gVkPruef"></div>
         </div>
         <div class="feld">
           <label for="g_email"><span data-gt="email"></span> <span class="pflicht">*</span></label>
           <input type="email" id="g_email" inputmode="email" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="name@example.com">
           <span class="email-pruefen" id="gEmailPruefen" role="status"></span>
         </div>
-        <div class="feld">
-          <label for="g_telefon"><span data-gt="telefon"></span> <span class="pflicht">*</span></label>
-          <input type="tel" id="g_telefon" inputmode="tel" autocomplete="off" autocorrect="off" spellcheck="false">
+        <div class="zwei">
+          <div class="feld">
+            <label for="g_telefon"><span data-gt="telefon"></span> <span class="pflicht">*</span></label>
+            <input type="tel" id="g_telefon" inputmode="tel" autocomplete="off" autocorrect="off" spellcheck="false">
+          </div>
+          <div class="feld">
+            <label for="g_mobil" data-gt="mobil"></label>
+            <input type="tel" id="g_mobil" inputmode="tel" autocomplete="off" autocorrect="off" spellcheck="false">
+          </div>
         </div>
         <p class="g-regel"><span class="pflicht">*</span> <span data-gt="emailOderTelefon"></span></p>
         <div class="feld"><label for="g_land"><span data-gt="land"></span> <span class="pflicht">*</span></label><select id="g_land" autocomplete="off"></select></div>
@@ -411,6 +439,9 @@
   <div class="vk-buehne">
     <video id="vkVideo" playsinline muted></video>
     <div class="vk-rahmen" id="vkRahmen"></div>
+    <p class="vk-schaerfe" id="vkSchaerfe" aria-hidden="true"></p>
+    <p class="vk-diag" id="vkDiag" aria-hidden="true"></p>
+    <p class="vk-kamerahinweis" id="vkKameraHinweis" role="status"></p>
     <p class="vk-anleitung" data-t="vkAnleitung"></p>
   </div>
   <div class="vk-leiste">
@@ -424,6 +455,13 @@
     <h2 data-t="vkLiest"></h2>
     <p class="klein" data-t="vkLiestText"></p>
     <button type="button" class="knopf-rand" data-aktion="vk-abbrechen" data-t="abbrechen"></button>
+  </div>
+</div>
+<div class="ueber" id="vkAusschnitt">
+  <div class="karte ueber-karte vk-ausschnitt-karte">
+    <h2>Ausschnitt für die Texterkennung (Testmodus)</h2>
+    <div class="vk-ausschnitt-bild" id="vkAusschnittBild"></div>
+    <button type="button" class="knopf knopf-blau" data-aktion="vk-ausschnitt-zu">Schließen</button>
   </div>
 </div>
 <footer class="fuss" id="fuss">

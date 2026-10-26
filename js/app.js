@@ -82,6 +82,7 @@
   $('f_vertrieb').addEventListener('change', pruefen);
   function leeren() {
     vkAbbrechen();
+    vkPruefWeg();
     vkMeldung('');
     ['f_email', 'f_vorname', 'f_nachname', 'f_einrichtung', 'f_telefon', 'f_position'].forEach(function (i) { $(i).value = ''; $(i).classList.remove('ok'); $(i).classList.remove('vorschlag'); });
     document.querySelectorAll('.chip').forEach(function (c) { c.classList.remove('an'); c.setAttribute('aria-pressed', 'false'); });
@@ -245,12 +246,14 @@
     if (w === 'datenschutz') datenschutz(true);
     if (w === 'datenschutz-zu') datenschutz(false);
     if (w === 'vk-abbrechen') vkAbbrechen();
+    if (w === 'vk-ausschnitt' && K.testmodus && vkAusschnittBild) { var hb = $('vkAusschnittBild'); hb.innerHTML = ''; hb.appendChild(vkAusschnittBild); $('vkAusschnitt').classList.add('an'); }
+    if (w === 'vk-ausschnitt-zu') $('vkAusschnitt').classList.remove('an');
   });
   $('datenschutz').addEventListener('click', function (ev) { if (ev.target === $('datenschutz')) datenschutz(false); });
   function datenschutz(an) { $('datenschutz').classList.toggle('an', an); }
   var VK = window.Visitenkarte, vkLaufNr = 0;
   var VK_ZIELE = { email: 'f_email', vorname: 'f_vorname', nachname: 'f_nachname', einrichtung: 'f_einrichtung', telefon: 'f_telefon', position: 'f_position' };
-  var VK_NEWSLETTER = { felder: VK_ZIELE, meldung: 'vkMeldung', email: 'f_email', emailHinweis: 'emailPruefen', anleitung: null,
+  var VK_NEWSLETTER = { felder: VK_ZIELE, meldung: 'vkMeldung', pruef: 'vkPruef', email: 'f_email', emailHinweis: 'emailPruefen', anleitung: null,
     telPos: function () { return V.telPosVerfuegbar(lang); }, nachher: function () { pruefen(); } };
   var vkZiel = VK_NEWSLETTER;
   function vkAn() { return !!VK && V.vkVerfuegbar(lang) && typeof WebAssembly === 'object' && 'createImageBitmap' in window; }
@@ -265,8 +268,64 @@
     m.textContent = t || ''; m.classList.toggle('an', !!t); m.classList.toggle('warn', !!warn);
   }
   function vkKameraZu() {
+    vkLiveAus();
     if (VK) VK.kameraSchliessen($('vkVideo'));
     $('vkKamera').classList.remove('an'); $('vkAusloeser').disabled = true;
+    vkKameraHinweis('');
+  }
+  var vkLiveUhr = null, vkSammelt = false;
+  function vkKameraHinweis(t, ruhig) {
+    var h = $('vkKameraHinweis'); h.textContent = t || ''; h.classList.toggle('an', !!t); h.classList.toggle('ruhig', !!ruhig);
+  }
+  function vkSchaerfeZeigen(w) {
+    var s = $('vkSchaerfe'), scharf = w >= VK.schwelle();
+    s.textContent = text(scharf ? 'vkScharf' : 'vkUnscharfKurz'); s.classList.add('an'); s.classList.toggle('scharf', scharf);
+    var d = $('vkDiag'), v = $('vkVideo');
+    if (K.testmodus) { d.textContent = 'TEST · Kamera ' + v.videoWidth + '×' + v.videoHeight + ' · Schärfe ' + Math.round(w) + ' / Schwelle ' + VK.schwelle(); d.classList.add('an'); }
+    else { d.textContent = ''; d.classList.remove('an'); }
+  }
+  function vkLiveAn() {
+    vkLiveAus();
+    vkLiveUhr = setInterval(function () {
+      if (vkSammelt) return;
+      try { var v = $('vkVideo'); if (v.videoWidth) vkSchaerfeZeigen(VK.schaerfeLive(v, $('vkRahmen'))); } catch (e) { }
+    }, 300);
+  }
+  function vkLiveAus() {
+    clearInterval(vkLiveUhr); vkLiveUhr = null; vkSammelt = false;
+    if (VK && VK.liveEnde) VK.liveEnde();
+    ['vkSchaerfe', 'vkDiag'].forEach(function (i) { var e = $(i); e.textContent = ''; e.classList.remove('an'); e.classList.remove('scharf'); });
+  }
+  var vkAusschnittBild = null;
+  function vkPruefWeg() {
+    ['vkPruef', 'gVkPruef'].forEach(function (i) { var e = $(i); if (e) { e.innerHTML = ''; e.classList.remove('an'); } });
+    if (vkAusschnittBild) { VK._verwerfen(vkAusschnittBild); vkAusschnittBild = null; }
+    $('vkAusschnittBild').innerHTML = ''; $('vkAusschnitt').classList.remove('an');
+  }
+  function vkPruefZeigen(diag, erg) {
+    if (!K.testmodus || !diag) return;
+    var e = $(vkZiel.pruef); if (!e) return;
+    var z = [];
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+    z.push('<b>Prüfanzeige (nur Testmodus)</b>');
+    if (diag.video) z.push('Kamera geliefert: ' + diag.video + (diag.fokus ? ' · Fokus: ' + esc(diag.fokus) : ''));
+    if (diag.wert !== undefined) z.push('Schärfe gewähltes Bild: ' + diag.wert + ' (Schwelle ' + diag.schwelle + ') · ' + diag.bilder + ' Bilder, schlechtestes ' + diag.kleinster);
+    z.push('Ausschnitt: ' + (diag.karte ? 'Karte ' + diag.karte.breite + ' × ' + diag.karte.hoehe + ' px, gedreht ' + diag.karte.dreh + '°' : (diag.quelle || 'keine Karte erkannt – ganzer Streifen')) +
+      ' → Texterkennung ' + diag.anTexterkennung + ' px');
+    z.push('Dauer: Aufnahme ' + (diag.aufnahmeMs || 0) + ' ms · Lesen ' + (erg ? erg.dauerMs : '–') + ' ms' + (erg ? ' (' + erg.versuche + ' Durchlauf' + (erg.versuche === 1 ? '' : 'e') + ')' : ''));
+    if (erg && erg.roh !== undefined) z.push('<details><summary>Erkannter Rohtext (tippen)</summary><pre>' + esc(erg.roh || '(leer)') + '</pre></details>');
+    if (vkAusschnittBild) z.push('<button type="button" class="knopf-rand" data-aktion="vk-ausschnitt">Ausschnitt zeigen</button>');
+    e.innerHTML = z.join('<br>'); e.classList.add('an');
+  }
+  function vkFokusText() {
+    try {
+      var t = $('vkVideo').srcObject && $('vkVideo').srcObject.getVideoTracks()[0];
+      if (!t || !t.getSettings) return '';
+      var s = t.getSettings(), c = t.getCapabilities ? t.getCapabilities() : {}, x = [];
+      if (s.focusMode) x.push(s.focusMode + (c.focusMode ? ' (möglich: ' + c.focusMode.join(', ') + ')' : ''));
+      if (c.focusDistance && c.focusDistance.min !== undefined) x.push('Naheinstellgrenze ' + Math.round(c.focusDistance.min * 1000) / 10 + ' cm');
+      return x.join(' · ');
+    } catch (e) { return ''; }
   }
   function vkAbbrechen() {
     vkLaufNr++;
@@ -326,6 +385,7 @@
     VK.kameraOeffnen($('vkVideo')).then(function () {
       if (nr !== vkLaufNr) { VK.kameraSchliessen($('vkVideo')); return; }
       $('vkAusloeser').disabled = false;
+      vkLiveAn();
     }, function () {
       if (nr !== vkLaufNr) return;
       vkKameraZu();
@@ -337,11 +397,34 @@
   }
   $('vkKnopf').addEventListener('click', function () { vkZiel = VK_NEWSLETTER; vkStarten(); });
   $('vkAusloeser').addEventListener('click', function () {
-    var bild;
-    try { bild = VK.ausVideo($('vkVideo'), $('vkRahmen')); } catch (e) { bild = null; }
-    vkKameraZu();
-    if (!bild) { VK.beenden(); vkMeldung(text('vkSchlecht'), true); return; }
-    vkLesen(bild);
+    if (vkSammelt) return;
+    var nr = vkLaufNr, video = $('vkVideo'), fokus = K.testmodus ? vkFokusText() : '';
+    vkSammelt = true; $('vkAusloeser').disabled = true;
+    vkKameraHinweis(text('vkRuhig'), true);
+    var p;
+    try { p = VK.besteAufnahme(video, $('vkRahmen'), { abbrechen: function () { return nr !== vkLaufNr; }, jeBild: function (w, b) { vkSchaerfeZeigen(b); } }); }
+    catch (e) { p = Promise.reject(e); }
+    p.then(function (a) {
+      vkSammelt = false;
+      if (!a) return;
+      if (nr !== vkLaufNr) { VK._verwerfen(a.bild); return; }
+      if (!a.scharf) {
+        VK._verwerfen(a.bild);
+        vkKameraHinweis(text('vkUnscharf'));
+        if (K.testmodus) $('vkDiag').textContent = 'TEST · Kamera ' + a.video + ' · bester Wert ' + a.wert + ' < Schwelle ' + a.schwelle + ' (' + a.bilder + ' Bilder)';
+        $('vkAusloeser').disabled = false;
+        return;
+      }
+      vkKameraZu();
+      var aus = VK.ausAufnahme(a);
+      var diag = K.testmodus ? { video: a.video, fokus: fokus, wert: a.wert, schwelle: a.schwelle, bilder: a.bilder, kleinster: a.kleinster, aufnahmeMs: a.ms,
+        karte: aus.karte, anTexterkennung: aus.anTexterkennung } : null;
+      vkLesen(aus.bild, diag);
+    }, function () {
+      vkSammelt = false;
+      if (nr !== vkLaufNr) return;
+      vkKameraZu(); VK.beenden(); vkMeldung(text('vkSchlecht'), true);
+    });
   });
   function vkKameraWarDa() {
     if ($('vkMeldung').textContent === text('vkImBrowser')) vkMeldung('');
@@ -355,30 +438,44 @@
     if (!f) { VK.beenden(); return; }
     var nr = vkLaufNr;
     $('vkLesen').classList.add('an');
-    VK.ausDatei(f).then(function (bild) { f = null; if (nr !== vkLaufNr) { VK._verwerfen(bild); return; } vkLesen(bild); },
+    VK.ausDatei(f).then(function (bild) { f = null; if (nr !== vkLaufNr) { VK._verwerfen(bild); return; }
+      vkLesen(bild, K.testmodus ? { quelle: 'Kamera-App des Browsers (ganzes Foto)', anTexterkennung: bild.width + '×' + bild.height } : null); },
       function () { f = null; $('vkLesen').classList.remove('an'); VK.beenden(); vkMeldung(text('vkSchlecht'), true); });
   });
   $('vkDatei').addEventListener('cancel', function () { vkKameraWarDa(); kameraAussen = false; clearTimeout(kameraAussenUhr); VK.beenden(); });
-  function vkLesen(bild) {
+  function vkLesen(bild, diag) {
     var nr = vkLaufNr;
     $('vkLesen').classList.add('an');
-    VK.erkennen(bild, { mitTelPos: vkZiel.telPos(), zeitlimitSekunden: (K.visitenkarte || {}).zeitlimitSekunden }).then(function (erg) {
+    vkVorschlaegeWeg();
+    vkPruefWeg();
+    if (K.testmodus && diag) {
+      vkAusschnittBild = document.createElement('canvas'); vkAusschnittBild.width = bild.width; vkAusschnittBild.height = bild.height;
+      vkAusschnittBild.getContext('2d').drawImage(bild, 0, 0);
+    }
+    VK.erkennen(bild, { mitTelPos: vkZiel.telPos(), zeitlimitSekunden: (K.visitenkarte || {}).zeitlimitSekunden, rohtext: !!(K.testmodus && diag) }).then(function (erg) {
       if (nr !== vkLaufNr) return;
       $('vkLesen').classList.remove('an');
       vkUebernehmen(erg.felder);
+      vkPruefZeigen(diag, erg);
       erg = null;
     }, function () {
       if (nr !== vkLaufNr) return;
       $('vkLesen').classList.remove('an');
       vkMeldung(text('vkSchlecht'), true);
+      vkPruefZeigen(diag, null);
     });
+  }
+  function vkVorschlaegeWeg() {
+    var ziele = vkZiel.felder;
+    Object.keys(ziele).forEach(function (k) { var el = $(ziele[k]); if (el && el.classList.contains('vorschlag')) { el.value = ''; el.classList.remove('vorschlag'); } });
+    emailMarkeWeg(vkZiel);
   }
   function vkUebernehmen(f) {
     var n = 0, tp = vkZiel.telPos(), ziele = vkZiel.felder;
     Object.keys(ziele).forEach(function (k) {
       var el = $(ziele[k]);
       if (!f[k]) return;
-      if ((k === 'telefon' || k === 'position') && !tp) return;
+      if ((k === 'telefon' || k === 'position' || k === 'mobil') && !tp) return;
       if (el.value && !el.classList.contains('vorschlag')) return;
       el.value = f[k]; el.classList.add('vorschlag'); n++;
     });
@@ -527,7 +624,7 @@
   }
   window.App = {
     zeige: zeige, neu: neu, text: text, lang: function () { return lang; }, leerlauf: leerlauf,
-    vkAn: vkAn, vkAbbrechen: vkAbbrechen, emailMarkeWeg: emailMarkeWeg,
+    vkAn: vkAn, vkAbbrechen: vkAbbrechen, emailMarkeWeg: emailMarkeWeg, vkPruefWeg: vkPruefWeg,
     vkStarten: function (ziel) { vkZiel = ziel || VK_NEWSLETTER; vkStarten(); },
     vkUebernehmen: function (ziel, f) { vkZiel = ziel || VK_NEWSLETTER; vkUebernehmen(f); },
     zaehlerZeigen: zaehlerZeigen, datenschutz: datenschutz, esc: esc, emailOk: emailOk, wachHalten: wachHalten

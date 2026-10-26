@@ -160,6 +160,32 @@ input.vorschlag { background: #DCEBFD; border-color: #5B8FD6; }
 .vk-leiste { flex: 0 0 auto; display: flex; gap: 1em; justify-content: center; padding: .8em 1em 1em; background: #111; }
 .vk-ausloeser { font-size: 1.2em; min-width: 11em; }
 .vk-zurueck { background: #fff; color: var(--grau); border: 2px solid var(--linie); }
+.g-td-liste { border-collapse: collapse; margin: .6em 0; font-size: .95em; }
+.g-td-liste td { border-bottom: 1px solid var(--linie); padding: .35em .8em .35em 0; }
+.g-td-liste td:last-child { font-weight: 700; text-align: right; }
+.g-td-frage { display: none; border: 2px solid #B3261E; background: #FBE3E1; border-radius: 6px; padding: .6em .9em; margin: .6em 0; }
+.g-td-frage.an { display: block; }
+.g-td-frage p { margin: 0 0 .5em; font-weight: 700; color: #7a1a14; }
+.g-td-ja { background: #B3261E; color: #fff; border: 0; margin-left: .8em; }
+.vk-schaerfe { position: absolute; left: .8em; top: .8em; margin: 0; padding: .35em .8em .35em 2em; border-radius: 99px; font-weight: 700; font-size: .95em; color: #fff; background: rgba(0,0,0,.6); display: none; }
+.vk-schaerfe.an { display: block; }
+.vk-schaerfe::before { content: ""; position: absolute; left: .7em; top: 50%; width: .8em; height: .8em; margin-top: -.4em; border-radius: 50%; background: #E0A030; }
+.vk-schaerfe.scharf { background: #1E7A3C; }
+.vk-schaerfe.scharf::before { background: #8EF0A8; }
+.vk-diag { position: absolute; right: .8em; top: .8em; margin: 0; padding: .3em .6em; border-radius: 4px; font: 700 .75em/1.35 Consolas, monospace; color: #fff; background: rgba(120,0,0,.7); display: none; text-align: right; }
+.vk-diag.an { display: block; }
+.vk-kamerahinweis { position: absolute; left: 50%; top: 3.6em; transform: translateX(-50%); width: min(70%, 34em); margin: 0; padding: .8em 1em; border-radius: 6px; background: var(--kupferhell); color: var(--kupfertext); border: 2px solid var(--kupfer); font-weight: 700; font-size: 1.05em; text-align: center; display: none; }
+.vk-kamerahinweis.an { display: block; }
+.vk-kamerahinweis.ruhig { background: rgba(0,0,0,.65); color: #fff; border-color: #fff; }
+.vk-pruef { display: none; font: .72em/1.4 Consolas, monospace; background: #FFF8E1; border: 1px dashed #B97A3D; border-radius: 4px; padding: .45em .6em; color: #3a2a10; }
+.vk-pruef.an { display: block; }
+.vk-pruef b { font-family: var(--schrift); }
+.vk-pruef pre { margin: .3em 0; max-height: 9em; overflow: auto; white-space: pre-wrap; background: #fff; border: 1px solid #e3d3b0; padding: .3em; }
+.vk-pruef summary { cursor: pointer; font-family: var(--schrift); font-weight: 700; color: var(--blau); min-height: 32px; line-height: 32px; }
+.vk-pruef button { font-size: 1.1em; min-height: 40px; padding: .2em .8em; margin-top: .2em; }
+.vk-ausschnitt-karte { width: 92%; }
+.vk-ausschnitt-bild { overflow: auto; max-height: 70vh; border: 1px solid var(--linie); background: #fff; }
+.vk-ausschnitt-bild canvas { display: block; width: 100%; height: auto; }
 .vk-lesen-karte { width: auto; max-width: 30em; align-items: center; text-align: center; padding: 1.6em 2em; }
 .telpos { display: none; flex-direction: column; gap: .45em; margin-top: .3em; padding-top: .6em; border-top: 1px solid var(--linie); }
 .telpos.an { display: flex; }

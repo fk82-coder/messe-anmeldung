@@ -1,5 +1,5 @@
 window.KONFIG = {
-  version: '0.4.1',
+  version: '0.4.2',
   testmodus: true,
   messe: 'DVG 2026',
   standardSprache: 'de',
@@ -36,7 +36,9 @@ window.KONFIG = {
     aktiv: true,
     zeitlimitSekunden: 30,
     sprachen: 'deu+eng',
-    seitenmodus: 3
+    seitenmodus: 3,
+    schaerfeSchwelle: 80,
+    aufnahmeMs: 1500
   },
   gespraech: {
     aktiv: true,

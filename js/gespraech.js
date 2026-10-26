@@ -120,7 +120,7 @@
       einrichtung: einzeilig(e.einrichtung, 200), einrichtungstyp: W.bereich[e.typ] || '',
       land: e.land && window.Laender ? window.Laender.wert(e.land) : '',
       vorname: einzeilig(e.vorname, 100), nachname: einzeilig(e.nachname, 100), position: einzeilig(e.position, 150),
-      email: einzeilig(e.email, 200), telefon: einzeilig(e.telefon, 60),
+      email: einzeilig(e.email, 200), telefon: einzeilig(e.telefon, 60), mobil: einzeilig(e.mobil, 60),
       produktgruppen: (e.produkte || []).map(function (k) { return W.produktgruppen[k]; }).filter(Boolean).join(', '),
       naechsterSchritt: naechster.map(function (k) { return W.naechster[k]; }).join(', '),
       rueckruf: naechster.indexOf('rueckruf') >= 0,
@@ -135,7 +135,7 @@
   function fehlendePflicht(e) {
     var f = [], em = String(e.email || '').trim();
     if (em && !emailOk(em)) f.push({ schritt: 1, text: 'E-Mail-Adresse (ungültig)' });
-    if (!emailOk(em) && !telefonOk(e.telefon)) f.push({ schritt: 1, text: 'E-Mail oder Telefon' });
+    if (!emailOk(em) && !telefonOk(e.telefon) && !telefonOk(e.mobil)) f.push({ schritt: 1, text: 'E-Mail oder Telefon' });
     if (!einzeilig(e.einrichtung)) f.push({ schritt: 1, text: 'Labor / Firma / Einrichtung / Klinik' });
     if (!W.bereich[e.typ]) f.push({ schritt: 1, text: 'Einrichtungstyp' });
     if (!e.land) f.push({ schritt: 1, text: 'Land' });
@@ -149,14 +149,14 @@
     return {
       email: String(e.email || '').trim(), anrede: '', vorname: e.vorname || '', nachname: e.nachname || '', einrichtung: e.einrichtung || '',
       bereich: W.bereich[e.typ] ? [e.typ] : [], bereichSonst: '', interessen: [], land: e.land || '',
-      telefon: e.vertrieb ? (e.telefon || '') : '', position: e.vertrieb ? (e.position || '') : '',
+      telefon: e.vertrieb ? (e.telefon || e.mobil || '') : '', position: e.vertrieb ? (e.position || '') : '',
       newsletter: !!e.newsletter, vertrieb: !!e.vertrieb
     };
   }
   var SPALTEN = [
     ['nr', 'Gesprächs-Nr.'], ['messe', 'Messe'], ['datum', 'Datum'], ['uhrzeit', 'Uhrzeit'], ['aufgenommenVon', 'Aufgenommen von'],
     ['bewertung', 'Bewertung'], ['einrichtung', 'Labor / Firma / Einrichtung / Klinik'], ['einrichtungstyp', 'Einrichtungstyp'], ['land', 'Land'],
-    ['vorname', 'Vorname'], ['nachname', 'Nachname'], ['position', 'Position'], ['email', 'E-Mail'], ['telefon', 'Telefon'],
+    ['vorname', 'Vorname'], ['nachname', 'Nachname'], ['position', 'Position'], ['email', 'E-Mail'], ['telefon', 'Telefon'], ['mobil', 'Mobil'],
     ['produktgruppen', 'Produktinteresse'], ['naechsterSchritt', 'Nächster Schritt'], ['rueckruf', 'Rückruf ausdrücklich gewünscht'],
     ['angebotswunsch', 'Angebotswunsch'], ['musterwunsch', 'Musterwunsch'], ['musteranschrift', 'Musteranschrift'], ['notiz', 'Messegespräch (Notiz)'],
     ['newsletterAngefragt', 'Newsletter angefragt (Bestätigung in CleverReach)'], ['vertriebAngefragt', 'Vertriebskontakt angefragt (Bestätigung in CleverReach)'],
@@ -215,7 +215,46 @@
     try { localStorage.setItem(nrSchluessel(), String(n)); } catch (e) { }
     return (G.kuerzel || 'MESSE') + '-' + ('00' + n).slice(-3);
   }
+  var TEST_ABLAGEN = [
+    { db: 'messe-app-gespraeche-test', store: 'gespraeche', text: 'Test-Gespräche' },
+    { db: 'messe-app-test', store: 'warteschlange', text: 'Test-Anmeldungen, die auf Netz warten' }
+  ];
+  function testSchluesselLs() {
+    var l = [];
+    try { for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (/^messe-app-/.test(k) && /-test(-|$)/.test(k)) l.push(k); } } catch (e) { }
+    return l;
+  }
+  function testAblage(a, leeren) {
+    return new Promise(function (ok) {
+      var r;
+      try { r = indexedDB.open(a.db); } catch (e) { ok(0); return; }
+      r.onupgradeneeded = function () { try { r.transaction.abort(); } catch (e) { } };
+      r.onerror = function () { ok(0); };
+      r.onsuccess = function () {
+        var d = r.result;
+        if (!d.objectStoreNames.contains(a.store)) { d.close(); ok(0); return; }
+        var t = d.transaction(a.store, leeren ? 'readwrite' : 'readonly'), st = t.objectStore(a.store), n = 0;
+        var c = st.count(); c.onsuccess = function () { n = c.result; if (leeren) st.clear(); };
+        t.oncomplete = function () { d.close(); ok(n); };
+        t.onerror = t.onabort = function () { d.close(); ok(-1); };
+      };
+    });
+  }
+  function testdatenZaehlen() {
+    return Promise.all(TEST_ABLAGEN.map(function (a) { return testAblage(a, false); })).then(function (n) {
+      var ls = testSchluesselLs();
+      return { gespraeche: n[0], warteschlange: n[1], pin: ls.some(function (k) { return /pin-test$/.test(k); }),
+        namen: ls.some(function (k) { return /standteam-test$/.test(k); }), zaehler: ls.some(function (k) { return /-nr-test-/.test(k); }), browserspeicher: ls.length };
+    });
+  }
+  function testdatenLoeschen() {
+    return Promise.all(TEST_ABLAGEN.map(function (a) { return testAblage(a, true); })).then(function () {
+      testSchluesselLs().forEach(function (k) { try { localStorage.removeItem(k); } catch (e) { } });
+      return testdatenZaehlen();
+    });
+  }
   var API = {
+    testdatenZaehlen: testdatenZaehlen, testdatenLoeschen: testdatenLoeschen,
     datenBauen: datenBauen, fehlendePflicht: fehlendePflicht, anmeldungBauen: anmeldungBauen, csvBauen: csvBauen, SPALTEN: SPALTEN,
     dateiname: dateiname, betreff: betreff, ablegen: ablegen, uebergeben: uebergeben, AUSGAENGE: AUSGAENGE, pinOk: pinOk, liste: liste, anzahl: anzahl, aeltestes: aeltestes, loeschen: loeschen,
     pinGesetzt: pinGesetzt, pinFestlegen: pinFestlegen, pinPruefen: pinPruefen, pinVergessen: pinVergessen, naechsteNr: naechsteNr,
@@ -225,15 +264,15 @@
   };
   window.Gespraech = API;
   if (!$('gespraech') || !A) return;
-  var SEITEN = ['gPinNeu', 'gespraech', 'gUebergabe', 'gDanke', 'gExport', 'gNamen'];
+  var SEITEN = ['gPinNeu', 'gespraech', 'gUebergabe', 'gDanke', 'gExport', 'gNamen', 'gTestdaten'];
   function seiteAktiv() { var s = document.querySelector('.seite.aktiv'); return !!s && SEITEN.indexOf(s.id) >= 0; }
   var schritt = 1, sendetGerade = false, dankeUhr = null, pinZweck = null, exportIds = [], nachPinNeu = 'gespraech';
   var VKZ = {
-    felder: { email: 'g_email', vorname: 'g_vorname', nachname: 'g_nachname', einrichtung: 'g_einrichtung', telefon: 'g_telefon', position: 'g_position' },
-    meldung: 'gVkMeldung', email: 'g_email', emailHinweis: 'gEmailPruefen', anleitung: tx('vkAnleitung'),
+    felder: { email: 'g_email', vorname: 'g_vorname', nachname: 'g_nachname', einrichtung: 'g_einrichtung', telefon: 'g_telefon', mobil: 'g_mobil', position: 'g_position' },
+    meldung: 'gVkMeldung', pruef: 'gVkPruef', email: 'g_email', emailHinweis: 'gEmailPruefen', anleitung: tx('vkAnleitung'),
     telPos: function () { return true; }, nachher: function () { }
   };
-  var TEXTFELDER = ['g_email', 'g_telefon', 'g_vorname', 'g_nachname', 'g_position', 'g_einrichtung', 'g_angebot', 'g_muster', 'g_anschrift', 'g_notiz'];
+  var TEXTFELDER = ['g_email', 'g_telefon', 'g_mobil', 'g_vorname', 'g_nachname', 'g_position', 'g_einrichtung', 'g_angebot', 'g_muster', 'g_anschrift', 'g_notiz'];
   function nutzbar() { return !!G.aktiv && (K.testmodus || !!G.texteGeprueft); }
   function chipsBauen(id, werte, beschrift) {
     $(id).innerHTML = Object.keys(werte).map(function (k) {
@@ -262,7 +301,7 @@
   function eingabe() {
     var mitEmail = emailOk($('g_email').value);
     return {
-      email: $('g_email').value, telefon: $('g_telefon').value, vorname: $('g_vorname').value, nachname: $('g_nachname').value,
+      email: $('g_email').value, telefon: $('g_telefon').value, mobil: $('g_mobil').value, vorname: $('g_vorname').value, nachname: $('g_nachname').value,
       position: $('g_position').value, einrichtung: $('g_einrichtung').value, typ: chipWert('gTyp'), land: $('g_land').value,
       produkte: chipWerte('gProdukte'), naechster: chipWerte('gNaechster'),
       angebot: $('g_angebot').value, muster: $('g_muster').value, anschrift: $('g_anschrift').value,
@@ -311,9 +350,11 @@
     $('g_haken').checked = false; $('g_vertrieb').checked = false;
     ['g_pin1', 'g_pin2', 'g_pin_frage'].forEach(function (i) { $(i).value = ''; });
     $('gPinFrage').classList.remove('an'); pinZweck = null;
-    ['gVkMeldung', 'gPinMeldung', 'gPinFrageMeldung', 'gExportMeldung', 'gNamenMeldung'].forEach(function (i) { $(i).textContent = ''; $(i).classList.remove('an'); });
+    $('gTdFrage').classList.remove('an');
+    ['gVkMeldung', 'gPinMeldung', 'gPinFrageMeldung', 'gExportMeldung', 'gNamenMeldung', 'gTdMeldung'].forEach(function (i) { $(i).textContent = ''; $(i).classList.remove('an'); });
     document.querySelectorAll('#gNamenFelder input').forEach(function (el) { el.value = ''; });
     A.emailMarkeWeg(VKZ);
+    if (A.vkPruefWeg) A.vkPruefWeg();
     $('gZeichen').textContent = '0';
     $('gTestUebertragung').innerHTML = ''; $('gTestUebertragung').classList.remove('an');
     $('gExportListe').innerHTML = ''; exportIds = []; exportZustand('');
@@ -336,7 +377,7 @@
     if (p1 !== p2) { meldung('gPinMeldung', tx('pinUngleich'), true); return; }
     pinFestlegen(p1).then(function () {
       $('g_pin1').value = ''; $('g_pin2').value = '';
-      if (nachPinNeu === 'namen') namenZeigen(); else gespraechStarten();
+      if (nachPinNeu === 'namen') namenZeigen(); else if (nachPinNeu === 'testdaten') testdatenZeigen(); else gespraechStarten();
       nachPinNeu = 'gespraech';
     });
   }
@@ -388,7 +429,7 @@
     var l = A.lang(), tl = T[l] && T[l].gKurzWeb ? T[l] : T.de;
     $('gKurz').innerHTML = G.webDatenschutzErgaenzt ? tl.gKurzWeb : tl.gKurzOhne;
     var e = eingabe();
-    $('gUeKontakt').textContent = [String(e.email).trim(), String(e.telefon).trim()].filter(Boolean).join(' · ');
+    $('gUeKontakt').textContent = [String(e.email).trim(), String(e.telefon).trim(), String(e.mobil || '').trim()].filter(Boolean).join(' · ');
     $('gUeWuensche').textContent = chipWerte('gNaechster').map(function (k) { return A.text('gN_' + k); }).filter(function (x) { return x && x !== '–'; }).join(', ') || '–';
     var mitEmail = emailOk(e.email);
     $('g_haken').disabled = !mitEmail; $('g_vertrieb').disabled = !mitEmail;
@@ -415,7 +456,7 @@
   function spracheGeaendert() { if ($('gUebergabe').classList.contains('aktiv')) uebergabeAktualisieren(); }
   function pinFragen(zweck) {
     pinZweck = zweck;
-    $('gPinFrageText').textContent = zweck === 'export' ? tx('pinFrageExport') : (zweck === 'namen' ? tx('pinFrageNamen') : tx('pinFrageZurueck'));
+    $('gPinFrageText').textContent = zweck === 'export' ? tx('pinFrageExport') : (zweck === 'namen' ? tx('pinFrageNamen') : (zweck === 'testdaten' ? tx('pinFrageTestdaten') : tx('pinFrageZurueck')));
     $('g_pin_frage').value = ''; meldung('gPinFrageMeldung', '');
     $('gPinVergessen').style.display = zweck === 'export' ? '' : 'none';
     $('gPinFrage').classList.add('an');
@@ -430,6 +471,33 @@
       if (zweck === 'zurueck') { A.zeige('gespraech'); schrittZeigen(3); }
       if (zweck === 'export') exportZeigen();
       if (zweck === 'namen') namenZeigen();
+      if (zweck === 'testdaten') testdatenZeigen();
+    });
+  }
+  function testdatenLos() {
+    if (!nutzbar()) return;
+    if (!pinGesetzt()) { pinNeuZeigen('testdaten'); return; }
+    pinFragen('testdaten');
+  }
+  function tdListe(z) {
+    var zeilen = [[TEST_ABLAGEN[0].text, z.gespraeche], [TEST_ABLAGEN[1].text, z.warteschlange],
+      ['Test-Namen des Standteams', z.namen ? 'gespeichert' : 'keine'], ['Test-Messe-PIN', z.pin ? 'gespeichert' : 'keine'],
+      ['Einträge im Browserspeicher (Test)', z.browserspeicher]];
+    $('gTdListe').innerHTML = zeilen.map(function (r) { return '<tr><td>' + esc(r[0]) + '</td><td>' + esc(String(r[1])) + '</td></tr>'; }).join('');
+  }
+  function testdatenZeigen() {
+    meldung('gTdMeldung', ''); $('gTdFrage').classList.remove('an'); $('gTdStart').style.display = '';
+    A.zeige('gTestdaten');
+    testdatenZaehlen().then(tdListe);
+  }
+  function testdatenJa() {
+    $('gTdFrage').classList.remove('an');
+    testdatenLoeschen().then(function (z) {
+      tdListe(z);
+      var leer = !z.gespraeche && !z.warteschlange && !z.browserspeicher;
+      meldung('gTdMeldung', leer ? tx('tdFertig') : 'Nicht alles gelöscht – bitte Technik informieren.', !leer);
+      $('gTdStart').style.display = 'none';
+      startZeigen();
     });
   }
   function pinVergessenFragen() {
@@ -539,6 +607,10 @@
   $('gLos').addEventListener('click', losGehen);
   $('gExportLos').addEventListener('click', function () { pinFragen('export'); });
   $('gNamenLos').addEventListener('click', namenLos);
+  $('gTestdatenLos').addEventListener('click', testdatenLos);
+  $('gTdLoeschen').addEventListener('click', function () { $('gTdFrage').classList.add('an'); });
+  $('gTdNein').addEventListener('click', function () { $('gTdFrage').classList.remove('an'); });
+  $('gTdJa').addEventListener('click', testdatenJa);
   $('gNamenOk').addEventListener('click', namenSpeichernKlick);
   $('gPinNeuOk').addEventListener('click', pinNeuSpeichern);
   $('g_pin2').addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); pinNeuSpeichern(); } });
@@ -564,10 +636,10 @@
   startZeigen();
   setInterval(function () { if ($('start').classList.contains('aktiv')) startZeigen(); }, 60000);
   function demoFuellen(vk) {
-    $('g_email').value = 'max.muster@example.com'; $('g_telefon').value = '+49 5603 000-12';
+    $('g_email').value = 'max.muster@example.com'; $('g_telefon').value = '+49 5603 000-12'; $('g_mobil').value = '+49 170 0000012';
     $('g_vorname').value = 'Max'; $('g_nachname').value = 'Muster'; $('g_position').value = 'Leitung Labor';
     $('g_einrichtung').value = 'Tierklinik Beispielstadt GmbH (Testdaten)';
-    if (vk) ['g_email', 'g_vorname', 'g_nachname', 'g_einrichtung', 'g_telefon', 'g_position'].forEach(function (i) { $(i).classList.add('vorschlag'); });
+    if (vk) ['g_email', 'g_vorname', 'g_nachname', 'g_einrichtung', 'g_telefon', 'g_mobil', 'g_position'].forEach(function (i) { $(i).classList.add('vorschlag'); });
     chipSetzen('gTyp', ['tiermedizin']); $('g_land').value = 'DE';
     chipSetzen('gProdukte', ['versand', 'formalin', 'objekttraeger']);
     chipSetzen('gNaechster', ['angebot', 'muster']);
@@ -587,6 +659,7 @@
     if (q.demonamen) standteamSpeichern(['Erika Beispiel', '', 'Max Muster', '']);
     var weiterGehen = function () {
       if (q.g === 'namen') { namenZeigen(); return; }
+      if (q.g === 'testdaten') { testdatenZeigen(); if (q.frage) setTimeout(function () { $('gTdFrage').classList.add('an'); }, 300); return; }
       if (q.g === 'export') { exportZeigen(); if (q.frage) setTimeout(function () { exportZustand('frage'); meldung('gExportMeldung', tx('exportGeteilt')); }, 300); return; }
       gespraechStarten();
       if (q.demo) demoFuellen(q.vk);
