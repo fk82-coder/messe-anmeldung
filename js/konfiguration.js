@@ -1,6 +1,6 @@
 window.KONFIG = {
-  version: '0.4.2',
-  testmodus: true,
+  version: '0.5.0',
+  testmodus: false,
   messe: 'DVG 2026',
   standardSprache: 'de',
   messeSprachen: ['de', 'en'],
@@ -14,15 +14,15 @@ window.KONFIG = {
   erfolgsseite: 'ok.html',
   felder: {
     email:       'email',
-    anrede:      'FEHLT_feldname_anrede',
-    vorname:     'FEHLT_feldname_vorname',
-    nachname:    'FEHLT_feldname_nachname',
-    einrichtung: 'FEHLT_feldname_einrichtung',
-    bereich:     'FEHLT_feldname_bereich',
-    interessen:  'FEHLT_feldname_interessen',
-    land:        'FEHLT_feldname_land',
-    quelle:      'FEHLT_feldname_quelle',
-    sprache:     'FEHLT_feldname_sprache'
+    anrede:      'global.anrede',
+    vorname:     'global.vorname',
+    nachname:    'global.nachname',
+    einrichtung: 'global.einrichtung',
+    bereich:     'global.bereich',
+    interessen:  'global.interessen',
+    land:        'global.land',
+    quelle:      'global.quelle',
+    sprache:     'global.sprache'
   },
   felderVertrieb: {
     telefon:  'FEHLT_feldname_telefon',
@@ -57,8 +57,8 @@ window.KONFIG = {
   },
   festeFelder: {},
   sprachen: {
-    de: { formular: 'FEHLT – Formular-Adresse DE', text: 'Text DE v2', doi: 'DOI DE v1', freigegeben: true,
-          formularVertrieb: 'FEHLT – Formular Vertriebskontakte DE', textMitVertrieb: 'Text DE v3', doiVertrieb: 'DOI VK DE v1' },
+    de: { formular: 'https://flow.cleverreach.com/fl/4aed4e63-2aa9-4385-81f1-3ae894872176/confirm', text: 'Text DE v2', doi: 'DOI DE v1', freigegeben: true,
+          formularVertrieb: 'https://flow.cleverreach.com/fl/57dc6291-59af-4c7f-8655-a42df71b9e53/confirm', textMitVertrieb: 'Text DE v3', doiVertrieb: 'DOI VK DE v1' },
     en: { formular: 'FEHLT – Formular-Adresse EN', text: 'Text EN v2', doi: 'DOI EN v1', freigegeben: false,
           formularVertrieb: 'FEHLT – Formular Vertriebskontakte EN', textMitVertrieb: 'Text EN v3', doiVertrieb: 'DOI VK EN v1' },
     es: { formular: 'FEHLT – Formular-Adresse ES', text: 'Text ES v2', doi: 'DOI ES v1', freigegeben: false },

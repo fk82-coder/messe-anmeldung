@@ -9,7 +9,7 @@
   });
   if (fehlt.length) {
     var m = document.getElementById('planbFehlt');
-    m.textContent = 'Noch nicht eingerichtet: Link zur CleverReach-Formularseite ' + fehlt.join(', ') + ' fehlt in js/konfiguration.js (planB).';
+    m.textContent = 'Noch nicht eingerichtet: Link zur Anmeldeseite ' + fehlt.join(', ') + ' fehlt. Bitte Technik informieren.';
     m.style.display = 'block';
   }
 })();
