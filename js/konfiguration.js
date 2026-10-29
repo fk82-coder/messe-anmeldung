@@ -1,12 +1,12 @@
 window.KONFIG = {
-  version: '0.5.0',
+  version: '0.5.4',
   testmodus: false,
   messe: 'DVG 2026',
   standardSprache: 'de',
   messeSprachen: ['de', 'en'],
   leerlaufSekunden: 90,
   dankeSekunden: 10,
-  hoechstdauerStunden: 72,
+  hoechstdauerStunden: 720,
   nachsendenSekunden: 60,
   zeitlimitSekunden: 12,
   versucheBeiUnklarerAntwort: 3,
@@ -55,7 +55,7 @@ window.KONFIG = {
     webDatenschutzErgaenzt: false,
     texteGeprueft: true
   },
-  festeFelder: {},
+  festeFelder: { 'email_confirm': '' },
   sprachen: {
     de: { formular: 'https://flow.cleverreach.com/fl/4aed4e63-2aa9-4385-81f1-3ae894872176/confirm', text: 'Text DE v2', doi: 'DOI DE v1', freigegeben: true,
           formularVertrieb: 'https://flow.cleverreach.com/fl/57dc6291-59af-4c7f-8655-a42df71b9e53/confirm', textMitVertrieb: 'Text DE v3', doiVertrieb: 'DOI VK DE v1' },

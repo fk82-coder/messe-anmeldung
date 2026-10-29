@@ -7,7 +7,7 @@
     '<p><b>Widerruf (Vertrieb):</b> Jederzeit formlos, zum Beispiel mit einer kurzen Antwort auf eine E-Mail unseres Vertriebs oder telefonisch unter 05603 502-0. Der Widerruf gilt für die Zukunft.</p>' +
     '<p><b>Nachweis:</b> Wir speichern, wann und wo (Messe) Sie sich angemeldet haben, welchen Einwilligungstext Sie gesehen haben, die Bestätigungsmail und Ihre Bestätigung. So können wir Ihre Einwilligung nachweisen. Rechtsgrundlage ist unser berechtigtes Interesse an diesem Nachweis (Art. 6 Abs. 1 lit. f DSGVO).</p>' +
     '<p><b>Bestätigung:</b> Sie erhalten eine E-Mail mit einem Bestätigungslink. Erst nach Ihrer Bestätigung tragen wir Sie ein. Bestätigen Sie nicht, löschen wir Ihre Angaben nach einem Monat.</p>' +
-    '<p><b>Am Messestand:</b> Ist das Tablet nicht mit dem Internet verbunden oder ist die Übertragung nicht sicher bestätigt, wird Ihre Anmeldung verschlüsselt auf dem Tablet zwischengespeichert. Nur diese App kann sie lesen. Sie wird automatisch übertragen, sobald das Tablet wieder online ist, und dann sofort auf dem Tablet gelöscht. Gelingt die Übertragung nicht innerhalb von drei Tagen, wird sie gelöscht.</p>' +
+    '<p><b>Am Messestand:</b> Zur Sicherheit wird Ihre Anmeldung verschlüsselt auf dem Tablet zwischengespeichert. Nur diese App kann sie lesen. Sie wird automatisch übertragen, sobald das Tablet online ist. Sie bleibt danach verschlüsselt auf dem Tablet, bis wir nach der Messe sichergestellt haben, dass CleverReach Ihre Anmeldung erhalten hat; wenn nötig, senden wir sie dafür noch einmal. Danach wird sie gelöscht, spätestens einen Monat nach Ihrer Anmeldung.</p>' +
     '{{VISITENKARTE}}' +
     '<p><b>Empfänger:</b> Den Versand übernimmt in unserem Auftrag die CleverReach GmbH &amp; Co. KG, Schafjückenweg 2, 26180 Rastede (Auftragsverarbeitung nach Art. 28 DSGVO). CleverReach speichert die Daten in Rechenzentren in Deutschland und Irland. Einer der Dienstleister von CleverReach ist die US-Firma Amazon Web Services, Inc.; werden dabei Daten in die USA übermittelt, gilt dafür der Angemessenheitsbeschluss der EU-Kommission zum EU-US-Datenschutzrahmen (EU-U.S. Data Privacy Framework, Art. 45 DSGVO). An andere geben wir Ihre Daten nicht weiter.</p>' +
     '<p><b>Keine Auswertung:</b> Wir messen nicht, ob Sie den Newsletter öffnen oder Links darin anklicken.</p>' +
@@ -53,7 +53,7 @@
       b2: '<p class="ds-kasten"><b>Ihr Widerspruchsrecht:</b> <b>Sie können der Verwendung Ihrer Angaben für Werbung jederzeit widersprechen, ohne Angabe von Gründen</b> – formlos, zum Beispiel mit einer kurzen Antwort auf eine E-Mail unseres Vertriebs oder telefonisch unter 05603 502-0. Danach verwenden wir Ihre Angaben nicht mehr für Werbung. Auch der übrigen Verarbeitung auf Grundlage unseres berechtigten Interesses können Sie aus Gründen widersprechen, die sich aus Ihrer besonderen Situation ergeben (Art. 21 DSGVO).</p>',
       b3alt: 'wird Ihre Anmeldung verschlüsselt auf dem Tablet zwischengespeichert.',
       b3: 'wird Ihre Anmeldung zu Newsletter oder Vertriebskontakt verschlüsselt auf dem Tablet zwischengespeichert.',
-      b3endeAlt: 'Gelingt die Übertragung nicht innerhalb von drei Tagen, wird sie gelöscht.',
+      b3endeAlt: 'Danach wird sie gelöscht, spätestens einen Monat nach Ihrer Anmeldung.',
       b3zusatz: 'Die Notiz zu Ihrer Anfrage am Messestand bleibt verschlüsselt auf dem Tablet, bis unser Standteam sie per E-Mail an unseren Vertrieb übergibt; danach wird sie auf dem Tablet gelöscht.',
       b4: '<p><b>Visitenkarte (freiwillig):</b> Auf Wunsch fotografiert das Tablet Ihre eigene Visitenkarte und liest den Text selbst aus, um die Felder vorzufüllen; im Gespräch übernimmt das unser Standteam mit der Karte, die Sie ihm dafür geben. Die Texterkennung läuft vollständig auf dem Tablet. Foto und erkannter Text verlassen das Tablet nicht, bleiben nur im Arbeitsspeicher und werden sofort verworfen. Übernommen werden nur E-Mail-Adresse, Vorname, Nachname, Labor/Firma/Einrichtung/Klinik, Telefonnummer und Position, bei einer Anfrage mit Musterwunsch zusätzlich Ihre Anschrift; alle übrigen Angaben der Karte übernehmen wir nicht. Für den Newsletter senden wir Telefonnummer, Position und Anschrift nie; Telefonnummer und Position erhält der Vertrieb nur mit Ihrem zweiten Häkchen oder als Teil Ihrer Anfrage. Die Vorschläge werden vor dem Senden geprüft und können geändert oder gelöscht werden. Danach verwenden wir die Angaben wie eingetippte (siehe „Wofür“, „Kontakt durch unseren Vertrieb“ und „Ihre Anfrage am Messestand“). Rechtsgrundlage für das Auslesen ist unser berechtigtes Interesse, das Eintippen zu ersparen (Art. 6 Abs. 1 lit. f DSGVO).</p>',
       b5alt: 'An andere geben wir Ihre Daten nicht weiter.',
@@ -93,7 +93,7 @@
       nlHinweis: 'Sie können sich jederzeit mit einem Klick abmelden. Ihre Adresse geben wir nicht an Dritte weiter.',
       los: 'Jetzt anmelden ›',
       v1: '✓ Nur die E-Mail ist Pflicht', v2: '✓ Abmeldung jederzeit',
-      v3: '✓ Verschlüsselt übertragen, danach nichts mehr auf dem Tablet',
+      v3: '✓ Verschlüsselt übertragen',
       abbrechen: 'Abbrechen', zurueck: '‹ Zurück',
       angabenTitel: 'Ihre Angaben', pflichtHinweis: 'Pflicht ist nur die E-Mail-Adresse. Alles andere ist freiwillig.',
       email: 'E-Mail-Adresse', emailFalsch: 'Bitte prüfen Sie die E-Mail-Adresse.',
@@ -122,7 +122,7 @@
       unterKnopf: 'Sie erhalten eine E-Mail mit einem Bestätigungslink. Erst nach Ihrer Bestätigung tragen wir Sie ein.',
       nlSprache: 'Unser Newsletter erscheint auf Deutsch und Englisch.',
       dsLink: 'Datenschutzhinweis lesen ›', dsTitel: 'Datenschutzhinweis zu Newsletter und Vertriebskontakt', schliessen: 'Schließen',
-      offlineVor: 'Dieses Tablet ist gerade nicht mit dem Internet verbunden. Ihre Anmeldung wird verschlüsselt auf dem Tablet zwischengespeichert und automatisch übertragen, sobald wir wieder online sind. Danach wird sie hier sofort gelöscht.',
+      offlineVor: 'Dieses Tablet ist gerade nicht mit dem Internet verbunden. Ihre Anmeldung wird verschlüsselt auf dem Tablet zwischengespeichert und automatisch übertragen, sobald wir wieder online sind.',
       moment: 'Einen Moment bitte …', uebertragen: 'Ihre Anmeldung wird übertragen.',
       danke: 'Vielen Dank!',
       danke1: 'Bitte öffnen Sie jetzt Ihr E-Mail-Postfach und klicken Sie auf den Bestätigungslink.',
@@ -130,9 +130,9 @@
       spam: 'Keine E-Mail? Bitte auch im Spam-Ordner nachsehen.',
       off1: 'Ihre Anmeldung ist verschlüsselt gespeichert und wird übertragen, sobald wir wieder online sind, voraussichtlich noch heute.',
       off2: 'Dann erhalten Sie die E-Mail mit dem Bestätigungslink. Erst nach Ihrer Bestätigung tragen wir Sie ein.',
-      off3: 'Gelingt die Übertragung nicht innerhalb von drei Tagen, löschen wir Ihre Angaben.',
+      off3: 'Spätestens einen Monat nach Ihrer Anmeldung löschen wir sie auf dem Tablet.',
       geleert: 'Das Formular wird geleert in',
-      nichts: 'Nach der Übertragung bleibt nichts auf dem Tablet.',
+      nichts: 'Auf dem Tablet wird Ihre Anmeldung spätestens nach einem Monat gelöscht.',
       dsText: DS_DE,
       dsTeile: DS_TEILE.de,
       vkKnopf: 'Eigene Visitenkarte lesen lassen',
@@ -475,7 +475,7 @@
     pinFrageZurueck: 'Nur Standteam: Messe-PIN eingeben, um zum Gespräch zurückzugehen.',
     pinFalsch: 'PIN falsch.',
     pinOk: 'Weiter', pinAbbrechen: 'Abbrechen', pinVergessen: 'PIN vergessen?',
-    pinVergessenFrage: 'PIN vergessen: Dann werden ALLE auf diesem Tablet gespeicherten Gespräche gelöscht (sonst käme jeder mit einer neuen PIN an sie heran). Danach eine neue PIN festlegen. Fortfahren?',
+    pinVergessenFrage: 'PIN vergessen: Dann werden ALLE auf diesem Tablet gespeicherten Gespräche und Anmeldungen gelöscht (sonst käme jeder mit einer neuen PIN an sie heran). Danach eine neue PIN festlegen. Fortfahren?',
     speichernFehler: 'Das Gespräch konnte auf diesem Tablet nicht gespeichert werden. Bitte die Angaben auf Papier notieren.',
     exportTitel: 'Gespräche an den Vertrieb senden',
     exportText: 'Die App erstellt eine Datei für Excel (eine Zeile je Gespräch, keine Newsletter-Anmeldungen) und öffnet das Teilen-Menü. Dort die Mail-App wählen, als Empfänger eintragen:',
@@ -489,6 +489,16 @@
     exportGeloescht: 'vom Tablet gelöscht.',
     exportNochNicht: 'Nichts gelöscht. Die Gespräche bleiben verschlüsselt gespeichert.',
     exportRegel: 'Danach prüfen: Zahl der gespeicherten Gespräche ist 0, in „Downloads“ liegt keine Datei, die gesendete Mail ist im Mail-Programm gelöscht.',
+    exportUsb: 'Datei nur speichern (für USB)',
+    exportGespeichert: 'Gespeichert in „Downloads“: {datei}. Jetzt per USB-Kabel auf den PC kopieren und danach auf dem Tablet in „Downloads“ löschen. Dann hier bestätigen.',
+    exportFrageUsb: 'Ist die Datei auf dem PC gespeichert und in „Downloads“ gelöscht?',
+    exportJaUsb: 'Ja – Gespräche vom Tablet löschen',
+    exportNochNichtUsb: 'Nichts gelöscht. Die Gespräche bleiben verschlüsselt gespeichert. Die Datei in „Downloads“ bitte löschen, sobald sie auf dem PC ist.',
+    exportAnmAnzahl: 'Newsletter-/Vertriebs-Anmeldungen (eigene Datei, nur über „Datei nur speichern“):',
+    exportGespeichertAnm: 'Gespeichert in „Downloads“: {datei}. Die Datei „Anmeldungen …“ nicht an den Vertrieb mailen – sie ist nur zum erneuten Senden an CleverReach. Jetzt per USB-Kabel auf den PC kopieren und danach auf dem Tablet in „Downloads“ löschen. Dann hier bestätigen.',
+    exportFrageUsbBeide: 'Sind beide Dateien auf dem PC gespeichert und in „Downloads“ gelöscht?',
+    exportJaUsbBeide: 'Ja – Gespräche und Anmeldungen vom Tablet löschen',
+    exportJaUsbAnm: 'Ja – Anmeldungen vom Tablet löschen',
     sp_nr: 'Nr.', sp_zeit: 'Zeit', sp_einr: 'Einrichtung', sp_bew: 'Bewertung', sp_schritt: 'Nächster Schritt',
     testmarke: 'TESTMODUS – Datei mit Testdaten, Betreff beginnt mit „TEST“.',
     zurueckStart: '‹ Zur Startseite',
@@ -525,7 +535,7 @@
     pinFrageNamen: 'Namen des Standteams ändern: bitte Messe-PIN eingeben.',
     tdKnopf: 'Testdaten löschen',
     tdTitel: 'Testdaten auf diesem Tablet',
-    tdText: 'Hier wird alles gelöscht, was im Testmodus auf diesem Tablet gespeichert wurde: Test-Gespräche, wartende Test-Anmeldungen, die Test-Namen des Standteams und die Test-Messe-PIN. Daten der Messefassung bleiben unberührt.',
+    tdText: 'Hier wird alles gelöscht, was im Testmodus auf diesem Tablet gespeichert wurde: Test-Gespräche, wartende und gespeicherte Test-Anmeldungen, die Test-Namen des Standteams und die Test-Messe-PIN. Daten der Messefassung bleiben unberührt.',
     tdLoeschen: 'Alle Testdaten auf diesem Tablet löschen',
     tdFrage: 'Wirklich alle Testdaten auf diesem Tablet löschen? Das lässt sich nicht rückgängig machen.',
     tdJa: 'Ja, endgültig löschen', tdNein: 'Abbrechen',

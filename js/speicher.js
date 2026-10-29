@@ -112,4 +112,82 @@
     }
   };
   window.Speicher = Speicher;
+  var aDbName = null, aDbV = null, aKeyV = null;
+  function aOeffnen() {
+    if (aDbV) return aDbV;
+    aDbName = messebetrieb() ? 'messe-app-anmeldungen' : 'messe-app-anmeldungen-test';
+    aDbV = new Promise(function (ok, fehler) {
+      var r = indexedDB.open(aDbName, 1);
+      r.onupgradeneeded = function () {
+        var db = r.result;
+        if (!db.objectStoreNames.contains('schluessel')) db.createObjectStore('schluessel');
+        if (!db.objectStoreNames.contains('anmeldungen')) db.createObjectStore('anmeldungen', { keyPath: 'id' });
+      };
+      r.onsuccess = function () { ok(r.result); };
+      r.onerror = function () { fehler(r.error); };
+    });
+    return aDbV;
+  }
+  function aAnfrage(speicher, art, fn) {
+    return aOeffnen().then(function (db) {
+      return new Promise(function (ok, fehler) {
+        var tx = db.transaction(speicher, art), st = tx.objectStore(speicher), ergebnis, r = fn(st);
+        if (r) r.onsuccess = function () { ergebnis = r.result; };
+        tx.oncomplete = function () { ok(ergebnis); };
+        tx.onerror = function () { fehler(tx.error); };
+        tx.onabort = function () { fehler(tx.error); };
+      });
+    });
+  }
+  function aSchluessel() {
+    if (aKeyV) return aKeyV;
+    aKeyV = aAnfrage('schluessel', 'readonly', function (st) { return st.get('aes'); }).then(function (k) {
+      if (k) return k;
+      return crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']).then(function (neu) {
+        return aAnfrage('schluessel', 'readwrite', function (st) { return st.put(neu, 'aes'); }).then(function () { return neu; });
+      });
+    });
+    return aKeyV;
+  }
+  window.Anmeldungen = {
+    ablegen: function (daten, erfasstMs) {
+      return aSchluessel().then(function (k) {
+        var iv = new Uint8Array(12); crypto.getRandomValues(iv);
+        return crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, k, new TextEncoder().encode(JSON.stringify(daten))).then(function (geheim) {
+          var e = { id: neueId(), erfasst: erfasstMs || Date.now(), modus: modusJetzt(), ergebnis: 'gestartet', versuchZeit: null, iv: iv, inhalt: geheim };
+          return aAnfrage('anmeldungen', 'readwrite', function (st) { return st.put(e); }).then(function () { return e.id; });
+        });
+      });
+    },
+    ergebnis: function (id, erg, jetztMs) {
+      return aAnfrage('anmeldungen', 'readwrite', function (st) {
+        var r = st.get(id);
+        r.onsuccess = function () { var e = r.result; if (!e) return; e.ergebnis = erg; e.versuchZeit = jetztMs || Date.now(); st.put(e); };
+        return null;
+      });
+    },
+    anzahl: function () { return aAnfrage('anmeldungen', 'readonly', function (st) { return st.count(); }); },
+    liste: function () {
+      return Promise.all([aSchluessel(), aAnfrage('anmeldungen', 'readonly', function (st) { return st.getAll(); })]).then(function (r) {
+        var k = r[0], l = (r[1] || []).slice().sort(function (a, b) { return a.erfasst - b.erfasst; });
+        return Promise.all(l.map(function (e) {
+          return crypto.subtle.decrypt({ name: 'AES-GCM', iv: e.iv }, k, e.inhalt).then(function (b) {
+            return { id: e.id, erfasst: e.erfasst, modus: e.modus, ergebnis: e.ergebnis, versuchZeit: e.versuchZeit, daten: JSON.parse(new TextDecoder().decode(b)) };
+          });
+        }));
+      });
+    },
+    loeschen: function (ids) { return aAnfrage('anmeldungen', 'readwrite', function (st) { ids.forEach(function (id) { st.delete(id); }); return null; }); },
+    allesLoeschen: function () { return aAnfrage('anmeldungen', 'readwrite', function (st) { return st.clear(); }); },
+    aufraeumen: function (hoechstdauerStunden, jetztMs) {
+      var grenze = (jetztMs || Date.now()) - hoechstdauerStunden * 3600 * 1000, geloescht = 0;
+      return aAnfrage('anmeldungen', 'readwrite', function (st) {
+        var r = st.openCursor();
+        r.onsuccess = function () { var c = r.result; if (!c) return; if (c.value.erfasst < grenze) { c.delete(); geloescht++; } c.continue(); };
+        return null;
+      }).then(function () { return geloescht; });
+    },
+    _roh: function () { return aAnfrage('anmeldungen', 'readonly', function (st) { return st.getAll(); }); },
+    _dbName: function () { return aOeffnen().then(function () { return aDbName; }); }
+  };
 })();

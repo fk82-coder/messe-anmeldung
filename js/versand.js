@@ -97,7 +97,7 @@
       interessen: (eingabe.interessen || []).map(function (i) { return K.werte.interessen[i]; }).filter(Boolean).join(', '),
       land: eingabe.land && window.Laender ? window.Laender.wert(eingabe.land) : ''
     };
-    for (k in freiwillig) if (freiwillig[k]) aus[namen[k]] = freiwillig[k];
+    for (k in freiwillig) if (!istFehlend(namen[k])) aus[namen[k]] = freiwillig[k];
     if (art === 'vertrieb' && telPosVerfuegbar(lang)) {
       var tel = (eingabe.telefon || '').trim(), pos = (eingabe.position || '').trim();
       if (tel) aus[namen.telefon] = tel;
@@ -106,6 +106,14 @@
     aus[namen.quelle] = quelle(lang, erfasstMs, offline, art);
     aus[namen.sprache] = lang;
     return { art: art, ziel: zielFuer(art, lang), felder: aus };
+  }
+  function alleFelder(felder, lang, art) {
+    var namen = felderFuer(lang, art || 'newsletter'), aus = {}, k;
+    for (k in K.festeFelder) aus[k] = K.festeFelder[k];
+    aus[namen.email] = '';
+    ['anrede', 'vorname', 'nachname', 'einrichtung', 'bereich', 'interessen', 'land'].forEach(function (n) { if (!istFehlend(namen[n])) aus[namen[n]] = ''; });
+    for (k in felder) aus[k] = felder[k];
+    return aus;
   }
   function paketeBauen(eingabe, lang, erfasstMs, offline) {
     var p = [];
@@ -195,27 +203,38 @@
       return K.bestaetigung === 'weiterleitung' ? sendenRahmen(paket) : sendenAntwort(paket);
     });
   }
-  function ablegen(eingabe, lang, erfasst, art, unklar) {
+  function ablegen(eingabe, lang, erfasst, art, unklar, anmId) {
     var p = felderBauen(eingabe, lang, erfasst, true, art);
-    return window.Speicher.ablegen({ lang: lang, art: p.art, ziel: p.ziel, felder: p.felder }, erfasst)
+    return window.Speicher.ablegen({ lang: lang, art: p.art, ziel: p.ziel, felder: p.felder, anmId: anmId || null }, erfasst)
       .then(function (id) { return unklar ? window.Speicher.versuchZaehlen(id, true) : null; });
   }
-  function anmelden(eingabe, lang) {
+  function merken(paket, lang, erfasst, herkunft) {
+    if (!window.Anmeldungen) return Promise.resolve(null);
+    return window.Anmeldungen.ablegen({ lang: lang, art: paket.art, ziel: paket.ziel, felder: paket.felder, herkunft: herkunft || 'Newsletter-Seite' }, erfasst)
+      .then(null, function () { return null; });
+  }
+  function vermerken(anmId, erg) {
+    if (!anmId || !window.Anmeldungen) return Promise.resolve();
+    return window.Anmeldungen.ergebnis(anmId, erg).then(null, function () { });
+  }
+  function anmelden(eingabe, lang, herkunft) {
     var erfasst = Date.now();
     var pakete = paketeBauen(eingabe, lang, erfasst, false);
     var ergebnis = { art: 'online', unklar: false, anzahl: pakete.length, arten: pakete.map(function (p) { return p.art; }) };
     return erreichbar(lang).then(function (netz) {
       var kette = Promise.resolve();
       pakete.forEach(function (paket) {
-        kette = kette.then(function () {
-          if (!netz) { ergebnis.art = 'offline'; return ablegen(eingabe, lang, erfasst, paket.art, false); }
+        kette = kette.then(function () { return merken(netz ? paket : felderBauen(eingabe, lang, erfasst, true, paket.art), lang, erfasst, herkunft); }).then(function (anmId) {
+          if (!netz) { ergebnis.art = 'offline'; return vermerken(anmId, 'offline').then(function () { return ablegen(eingabe, lang, erfasst, paket.art, false, anmId); }); }
           return senden(paket, lang).then(function (erg) {
-            if (erg === 'bestaetigt') return;
-            if (erg === 'unklar') {
-              ergebnis.unklar = true; return ablegen(eingabe, lang, erfasst, paket.art, true);
-            }
-            ergebnis.art = 'offline'; netz = false;
-            return ablegen(eingabe, lang, erfasst, paket.art, false);
+            return vermerken(anmId, erg).then(function () {
+              if (erg === 'bestaetigt') return;
+              if (erg === 'unklar') {
+                ergebnis.unklar = true; return ablegen(eingabe, lang, erfasst, paket.art, true, anmId);
+              }
+              ergebnis.art = 'offline'; netz = false;
+              return ablegen(eingabe, lang, erfasst, paket.art, false, anmId);
+            });
           });
         });
       });
@@ -241,10 +260,10 @@
             return window.Speicher.loeschen(e.id).then(function () { return true; });
           }
           var aktuell = zielFuer(e.daten.art || 'newsletter', e.daten.lang);
-          var paket = { art: e.daten.art, ziel: istFehlend(aktuell) ? e.daten.ziel : aktuell, felder: e.daten.felder };
+          var paket = { art: e.daten.art, ziel: istFehlend(aktuell) ? e.daten.ziel : aktuell, felder: alleFelder(e.daten.felder, e.daten.lang, e.daten.art) };
           return senden(paket, e.daten.lang).then(function (erg) {
-            if (erg === 'bestaetigt') { bericht.gesendet++; return window.Speicher.loeschen(e.id).then(function () { return true; }); }
-            if (erg === 'unklar') { bericht.unklar++; return window.Speicher.versuchZaehlen(e.id, true).then(function () { return true; }); }
+            if (erg === 'bestaetigt') { bericht.gesendet++; return vermerken(e.daten.anmId, 'nachgesendet').then(function () { return window.Speicher.loeschen(e.id); }).then(function () { return true; }); }
+            if (erg === 'unklar') { bericht.unklar++; return vermerken(e.daten.anmId, 'unklar').then(function () { return window.Speicher.versuchZaehlen(e.id, true); }).then(function () { return true; }); }
             bericht.fehler++; return window.Speicher.versuchZaehlen(e.id, false).then(function () { return false; });
           });
         });
@@ -258,6 +277,7 @@
     quelle: quelle,
     zeitText: zeitText,
     felderBauen: felderBauen,
+    alleFelder: alleFelder,
     bereichText: bereichText,
     paketeBauen: paketeBauen,
     sprachePruefen: sprachePruefen,

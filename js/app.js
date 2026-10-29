@@ -564,6 +564,7 @@
     setzeSprache(K.standardSprache);
     testleisteZeigen();
     S.aufraeumen(K.hoechstdauerStunden).then(zaehlerZeigen).then(nachsenden);
+    if (window.Anmeldungen) window.Anmeldungen.aufraeumen(K.hoechstdauerStunden).catch(function () { });
     wachHalten();
     if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
     if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {

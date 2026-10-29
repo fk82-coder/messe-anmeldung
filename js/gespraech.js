@@ -95,7 +95,8 @@
     return pinHash(p.salz, String(pin)).then(function (h) { return h === p.hash; });
   }
   function pinVergessen() {
-    return allesLoeschen().then(function () { try { localStorage.removeItem(pinSchluessel()); } catch (e) { } });
+    return allesLoeschen().then(function () { return window.Anmeldungen ? window.Anmeldungen.allesLoeschen() : null; })
+      .then(function () { try { localStorage.removeItem(pinSchluessel()); } catch (e) { } });
   }
   function namenSchluessel() { return 'messe-app-standteam-' + modus(); }
   function standteamVorgabe() { return (G.standteam || []).slice(); }
@@ -198,11 +199,58 @@
     }
     return Promise.resolve(herunterladen(csv, name, titel, text));
   }
-  function herunterladen(csv, name, titel, text) {
+  function dateiAblegen(csv, name) {
     var url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
     var a = document.createElement('a'); a.href = url; a.download = name; a.style.display = 'none';
     document.body.appendChild(a); a.click();
     setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 4000);
+  }
+  function nurSpeichern(eintraege, jetztMs) {
+    var name = dateiname(jetztMs);
+    dateiAblegen(csvBauen(eintraege), name);
+    return Promise.resolve(name);
+  }
+  var ANM_SPALTEN = [
+    ['datum', 'Datum'], ['uhrzeit', 'Uhrzeit'], ['formular', 'Formular (CleverReach)'], ['herkunft', 'Erfasst über'],
+    ['ergebnis', 'Letzter Sendeversuch'], ['versuch', 'Zeit letzter Versuch'],
+    ['email', 'E-Mail'], ['anrede', 'Anrede'], ['vorname', 'Vorname'], ['nachname', 'Nachname'], ['einrichtung', 'Labor / Firma / Einrichtung / Klinik'],
+    ['bereich', 'Bereich'], ['interessen', 'Interessen'], ['land', 'Land'], ['telefon', 'Telefon'], ['position', 'Position'],
+    ['quelle', 'Quelle (unverändert senden)'], ['sprache', 'Sprache'], ['test', 'Testdaten'], ['app', 'App-Version']
+  ];
+  var ANM_ERGEBNIS = {
+    gestartet: 'Sendeversuch nicht abgeschlossen', bestaetigt: 'gesendet, Weiterleitung ok.html (Annahme nicht belegt)',
+    nachgesendet: 'nachgesendet, Weiterleitung ok.html (Annahme nicht belegt)', unklar: 'unklare Antwort',
+    offline: 'kein Netz, wartete auf Nachsenden', fehler: 'kein Netz, wartete auf Nachsenden'
+  };
+  function anmZeile(e) {
+    var d = e.daten || {}, f = d.felder || {}, s = K.sprachen[d.lang] || {}, n = {}, k;
+    for (k in K.felder) n[k] = K.felder[k];
+    if (d.art === 'vertrieb' && K.felderVertrieb) for (k in K.felderVertrieb) n[k] = K.felderVertrieb[k];
+    if (s.felder) for (k in s.felder) n[k] = s.felder[k];
+    var z = {
+      datum: datumText(e.erfasst), uhrzeit: uhrText(e.erfasst), formular: d.art === 'vertrieb' ? 'Vertriebskontakte' : 'Newsletter',
+      herkunft: d.herkunft || '', ergebnis: ANM_ERGEBNIS[e.ergebnis] || String(e.ergebnis || ''),
+      versuch: e.versuchZeit ? datumText(e.versuchZeit) + ' ' + uhrText(e.versuchZeit) : '', test: e.modus !== 'messe', app: K.version
+    };
+    ['email', 'anrede', 'vorname', 'nachname', 'einrichtung', 'bereich', 'interessen', 'land', 'telefon', 'position', 'quelle', 'sprache']
+      .forEach(function (x) { z[x] = n[x] && f[n[x]] != null ? f[n[x]] : ''; });
+    return z;
+  }
+  function anmCsvBauen(eintraege) {
+    var zeilen = [ANM_SPALTEN.map(function (s) { return zelle(s[1]); }).join(';')];
+    eintraege.forEach(function (e) { var z = anmZeile(e); zeilen.push(ANM_SPALTEN.map(function (s) { return zelle(z[s[0]]); }).join(';')); });
+    return '﻿' + zeilen.join('\r\n') + '\r\n';
+  }
+  function anmDateiname(ms) { var d = new Date(ms); return jjjjmmtt(ms) + ' Anmeldungen ' + (G.kuerzel || 'Messe') + ' ' + zwei(d.getHours()) + zwei(d.getMinutes()) + (K.testmodus ? ' TEST' : '') + '.csv'; }
+  function anmeldungenSpeichern(eintraege, jetztMs) {
+    var name = anmDateiname(jetztMs);
+    dateiAblegen(anmCsvBauen(eintraege), name);
+    return Promise.resolve(name);
+  }
+  function anmListe() { return window.Anmeldungen ? window.Anmeldungen.liste() : Promise.resolve([]); }
+  function anmAnzahl() { return window.Anmeldungen ? window.Anmeldungen.anzahl().then(null, function () { return 0; }) : Promise.resolve(0); }
+  function herunterladen(csv, name, titel, text) {
+    dateiAblegen(csv, name);
     var mail = 'mailto:' + (G.empfaenger || '') + '?subject=' + encodeURIComponent(titel) + '&body=' +
       encodeURIComponent(text + '\n\nBitte die heruntergeladene Datei „' + name + '“ anhängen und sie danach im Ordner „Downloads“ löschen.');
     setTimeout(function () { try { window.location.href = mail; } catch (e) { } }, 800);
@@ -217,7 +265,8 @@
   }
   var TEST_ABLAGEN = [
     { db: 'messe-app-gespraeche-test', store: 'gespraeche', text: 'Test-Gespräche' },
-    { db: 'messe-app-test', store: 'warteschlange', text: 'Test-Anmeldungen, die auf Netz warten' }
+    { db: 'messe-app-test', store: 'warteschlange', text: 'Test-Anmeldungen, die auf Netz warten' },
+    { db: 'messe-app-anmeldungen-test', store: 'anmeldungen', text: 'Gespeicherte Test-Anmeldungen (v0.5.3)' }
   ];
   function testSchluesselLs() {
     var l = [];
@@ -243,7 +292,7 @@
   function testdatenZaehlen() {
     return Promise.all(TEST_ABLAGEN.map(function (a) { return testAblage(a, false); })).then(function (n) {
       var ls = testSchluesselLs();
-      return { gespraeche: n[0], warteschlange: n[1], pin: ls.some(function (k) { return /pin-test$/.test(k); }),
+      return { gespraeche: n[0], warteschlange: n[1], anmeldungen: n[2], pin: ls.some(function (k) { return /pin-test$/.test(k); }),
         namen: ls.some(function (k) { return /standteam-test$/.test(k); }), zaehler: ls.some(function (k) { return /-nr-test-/.test(k); }), browserspeicher: ls.length };
     });
   }
@@ -256,9 +305,10 @@
   var API = {
     testdatenZaehlen: testdatenZaehlen, testdatenLoeschen: testdatenLoeschen,
     datenBauen: datenBauen, fehlendePflicht: fehlendePflicht, anmeldungBauen: anmeldungBauen, csvBauen: csvBauen, SPALTEN: SPALTEN,
-    dateiname: dateiname, betreff: betreff, ablegen: ablegen, uebergeben: uebergeben, AUSGAENGE: AUSGAENGE, pinOk: pinOk, liste: liste, anzahl: anzahl, aeltestes: aeltestes, loeschen: loeschen,
+    dateiname: dateiname, betreff: betreff, ablegen: ablegen, uebergeben: uebergeben, nurSpeichern: nurSpeichern, AUSGAENGE: AUSGAENGE, pinOk: pinOk, liste: liste, anzahl: anzahl, aeltestes: aeltestes, loeschen: loeschen,
     pinGesetzt: pinGesetzt, pinFestlegen: pinFestlegen, pinPruefen: pinPruefen, pinVergessen: pinVergessen, naechsteNr: naechsteNr,
     standteamNamen: standteamNamen, standteamEigen: standteamEigen, standteamSpeichern: standteamSpeichern, _namenSchluessel: namenSchluessel,
+    anmCsvBauen: anmCsvBauen, ANM_SPALTEN: ANM_SPALTEN, anmDateiname: anmDateiname, anmeldungenSpeichern: anmeldungenSpeichern,
     leeren: function () { }, seiteAktiv: function () { return false; }, spracheGeaendert: function () { },
     _roh: rohListe, _allesLoeschen: allesLoeschen, _dbName: function () { return db().then(function () { return dbName; }); }
   };
@@ -332,10 +382,10 @@
   function startZeigen() {
     $('gStart').classList.toggle('an', nutzbar());
     $('start').classList.toggle('mit-gespraech', nutzbar());
-    return Promise.all([anzahl(), aeltestes()]).then(function (r) {
+    return Promise.all([anzahl(), aeltestes(), anmAnzahl()]).then(function (r) {
       var n = r[0] || 0, alt = n && (Date.now() - r[1]) > (G.warnenNachStunden || 72) * 3600 * 1000;
       $('gStartZaehler').textContent = n + ' ' + (n === 1 ? tx('gespeichertEins') : tx('gespeichertMehr'));
-      $('gExportLos').disabled = n === 0;
+      $('gExportLos').disabled = n === 0 && !r[2];
       $('gStartWarnung').textContent = alt ? tx('warnung72') : '';
       $('gStatus').textContent = n ? ('Standteam: ' + n + ' ' + (n === 1 ? tx('gespeichertEins') : tx('gespeichertMehr')) + (alt ? ' – ' + tx('warnungKurz') : '')) : '';
       $('gStatus').classList.toggle('alarm', !!alt);
@@ -357,7 +407,7 @@
     if (A.vkPruefWeg) A.vkPruefWeg();
     $('gZeichen').textContent = '0';
     $('gTestUebertragung').innerHTML = ''; $('gTestUebertragung').classList.remove('an');
-    $('gExportListe').innerHTML = ''; exportIds = []; exportZustand('');
+    $('gExportListe').innerHTML = ''; exportIds = []; anmIds = []; usbIds = []; usbAnmIds = []; exportZustand('');
     wuenscheZeigen();
     schrittZeigen(1);
     startZeigen();
@@ -480,7 +530,7 @@
     pinFragen('testdaten');
   }
   function tdListe(z) {
-    var zeilen = [[TEST_ABLAGEN[0].text, z.gespraeche], [TEST_ABLAGEN[1].text, z.warteschlange],
+    var zeilen = [[TEST_ABLAGEN[0].text, z.gespraeche], [TEST_ABLAGEN[1].text, z.warteschlange], [TEST_ABLAGEN[2].text, z.anmeldungen],
       ['Test-Namen des Standteams', z.namen ? 'gespeichert' : 'keine'], ['Test-Messe-PIN', z.pin ? 'gespeichert' : 'keine'],
       ['Einträge im Browserspeicher (Test)', z.browserspeicher]];
     $('gTdListe').innerHTML = zeilen.map(function (r) { return '<tr><td>' + esc(r[0]) + '</td><td>' + esc(String(r[1])) + '</td></tr>'; }).join('');
@@ -494,7 +544,7 @@
     $('gTdFrage').classList.remove('an');
     testdatenLoeschen().then(function (z) {
       tdListe(z);
-      var leer = !z.gespraeche && !z.warteschlange && !z.browserspeicher;
+      var leer = !z.gespraeche && !z.warteschlange && !z.anmeldungen && !z.browserspeicher;
       meldung('gTdMeldung', leer ? tx('tdFertig') : 'Nicht alles gelöscht – bitte Technik informieren.', !leer);
       $('gTdStart').style.display = 'none';
       startZeigen();
@@ -516,7 +566,7 @@
     A.zeige('sendet');
     var crVorher = V.protokoll.length, erg = { n: null };
     ablegen(daten, jetzt).then(function () {
-      return anm ? V.anmelden(anm, lang).then(function (n) { erg.n = n; }) : null;
+      return anm ? V.anmelden(anm, lang, 'Messegespräch ' + nr).then(function (n) { erg.n = n; }) : null;
     }).then(function () {
       anm = null;
       leeren();
@@ -551,23 +601,34 @@
     b.innerHTML = '<b>Testmodus – Messegespräch verschlüsselt auf dem Tablet gespeichert. Diese Zeile kommt in die Datei für den Vertrieb:</b><table>' + zeilen + '</table>' + crText;
     b.classList.add('an');
   }
+  var exportWeg = '', anmIds = [], usbIds = [], usbAnmIds = [];
   function exportZustand(z) {
-    $('gExportFrage').classList.toggle('an', z === 'frage');
-    $('gExportDatei').disabled = z === 'leer';
+    var usb = z === 'frageUsb';
+    if (z === 'frage' || usb) exportWeg = usb ? 'usb' : 'teilen';
+    $('gExportFrage').classList.toggle('an', z === 'frage' || usb);
+    var beide = usb && usbIds.length && usbAnmIds.length, nurAnm = usb && !usbIds.length && usbAnmIds.length;
+    $('gExportFrageText').textContent = usb ? (beide ? tx('exportFrageUsbBeide') : tx('exportFrageUsb')) : tx('exportFrage');
+    $('gExportJa').textContent = usb ? (beide ? tx('exportJaUsbBeide') : (nurAnm ? tx('exportJaUsbAnm') : tx('exportJaUsb'))) : tx('exportJa');
+    $('gExportDatei').disabled = z === 'leer' || !exportIds.length;
+    $('gExportUsb').disabled = z === 'leer';
   }
   function exportZeigen() {
     meldung('gExportMeldung', '');
     $('gExportAn').textContent = G.empfaenger || '';
     $('gExportTestmarke').classList.toggle('an', !!K.testmodus);
-    liste().then(function (l) {
+    var aufr = window.Anmeldungen ? window.Anmeldungen.aufraeumen(K.hoechstdauerStunden).then(null, function () { }) : Promise.resolve();
+    aufr.then(function () { return Promise.all([liste(), anmListe()]); }).then(function (r) {
+      var l = r[0];
       exportIds = l.map(function (e) { return e.id; });
+      anmIds = r[1].map(function (e) { return e.id; });
       $('gExportAnzahl').textContent = l.length;
+      $('gExportAnmAnzahl').textContent = anmIds.length;
       $('gExportListe').innerHTML = l.map(function (e) {
         var d = e.daten;
         return '<tr><td>' + esc(d.nr) + '</td><td>' + esc(d.datum + ' ' + d.uhrzeit) + '</td><td>' + esc(d.einrichtung) + '</td><td>' + esc(d.bewertung) + '</td><td>' + esc(d.naechsterSchritt) + '</td></tr>';
       }).join('');
-      l = null;
-      exportZustand(exportIds.length ? '' : 'leer');
+      l = null; r = null;
+      exportZustand(exportIds.length || anmIds.length ? '' : 'leer');
       A.zeige('gExport');
     });
   }
@@ -584,12 +645,39 @@
       });
     }, function () { meldung('gExportMeldung', tx('speichernFehler'), true); });
   }
+  function exportUsbLos() {
+    var ids = exportIds.slice(), aIds = anmIds.slice();
+    if (!ids.length && !aIds.length) return;
+    Promise.all([liste(), anmListe()]).then(function (r) {
+      var auswahl = r[0].filter(function (e) { return ids.indexOf(e.id) >= 0; });
+      var aAuswahl = r[1].filter(function (e) { return aIds.indexOf(e.id) >= 0; });
+      var jetzt = Date.now(), namen = [];
+      r = null;
+      var kette = auswahl.length ? nurSpeichern(auswahl, jetzt).then(function (n) { namen.push(n); }) : Promise.resolve();
+      return kette.then(function () {
+        if (!aAuswahl.length) return null;
+        return new Promise(function (ok) { setTimeout(ok, auswahl.length ? 700 : 0); }).then(function () { return anmeldungenSpeichern(aAuswahl, jetzt); }).then(function (n) { namen.push(n); });
+      }).then(function () {
+        usbIds = auswahl.map(function (e) { return e.id; }); usbAnmIds = aAuswahl.map(function (e) { return e.id; });
+        auswahl = null; aAuswahl = null;
+        meldung('gExportMeldung', tx(usbAnmIds.length ? 'exportGespeichertAnm' : 'exportGespeichert').replace('{datei}', namen.join(' und ')));
+        exportZustand('frageUsb');
+      });
+    }, function () { meldung('gExportMeldung', tx('speichernFehler'), true); });
+  }
   function exportGesendet() {
-    var ids = exportIds.slice();
+    var usb = exportWeg === 'usb';
+    var ids = usb ? usbIds.slice() : exportIds.slice(), aIds = usb ? usbAnmIds.slice() : [];
     loeschen(ids).then(function () {
-      exportIds = []; $('gExportListe').innerHTML = ''; $('gExportAnzahl').textContent = '0';
-      exportZustand('leer');
-      meldung('gExportMeldung', ids.length + (ids.length === 1 ? ' Gespräch ' : ' Gespräche ') + tx('exportGeloescht'));
+      return aIds.length && window.Anmeldungen ? window.Anmeldungen.loeschen(aIds) : null;
+    }).then(function () {
+      exportIds = exportIds.filter(function (i) { return ids.indexOf(i) < 0; });
+      anmIds = anmIds.filter(function (i) { return aIds.indexOf(i) < 0; });
+      usbIds = []; usbAnmIds = [];
+      if (!exportIds.length) $('gExportListe').innerHTML = '';
+      $('gExportAnzahl').textContent = exportIds.length; $('gExportAnmAnzahl').textContent = anmIds.length;
+      exportZustand(exportIds.length || anmIds.length ? '' : 'leer');
+      meldung('gExportMeldung', ids.length + (ids.length === 1 ? ' Gespräch ' : ' Gespräche ') + (aIds.length ? 'und ' + aIds.length + (aIds.length === 1 ? ' Anmeldung ' : ' Anmeldungen ') : '') + tx('exportGeloescht'));
       startZeigen();
     });
   }
@@ -630,8 +718,12 @@
   $('g_pin_frage').addEventListener('keydown', function (ev) { if (ev.key === 'Enter') { ev.preventDefault(); pinFrageOk(); } });
   $('gPinVergessen').addEventListener('click', pinVergessenFragen);
   $('gExportDatei').addEventListener('click', exportLos);
+  $('gExportUsb').addEventListener('click', exportUsbLos);
   $('gExportJa').addEventListener('click', exportGesendet);
-  $('gExportNein').addEventListener('click', function () { exportZustand(''); meldung('gExportMeldung', tx('exportNochNicht')); });
+  $('gExportNein').addEventListener('click', function () {
+    var usb = exportWeg === 'usb';
+    exportZustand(''); meldung('gExportMeldung', usb ? tx('exportNochNichtUsb') : tx('exportNochNicht'), usb);
+  });
   API.leeren = leeren; API.seiteAktiv = seiteAktiv; API.spracheGeaendert = spracheGeaendert;
   startZeigen();
   setInterval(function () { if ($('start').classList.contains('aktiv')) startZeigen(); }, 60000);
@@ -660,7 +752,12 @@
     var weiterGehen = function () {
       if (q.g === 'namen') { namenZeigen(); return; }
       if (q.g === 'testdaten') { testdatenZeigen(); if (q.frage) setTimeout(function () { $('gTdFrage').classList.add('an'); }, 300); return; }
-      if (q.g === 'export') { exportZeigen(); if (q.frage) setTimeout(function () { exportZustand('frage'); meldung('gExportMeldung', tx('exportGeteilt')); }, 300); return; }
+      if (q.g === 'export') {
+        exportZeigen();
+        if (q.frage === 'usb') setTimeout(function () { exportZustand('frageUsb'); meldung('gExportMeldung', tx('exportGespeichert').replace('{datei}', dateiname(Date.now()))); }, 300);
+        else if (q.frage) setTimeout(function () { exportZustand('frage'); meldung('gExportMeldung', tx('exportGeteilt')); }, 300);
+        return;
+      }
       gespraechStarten();
       if (q.demo) demoFuellen(q.vk);
       var fl = q.lang ? document.querySelector('#gUebergabe .fl[data-l="' + q.lang + '"]') : null;
