@@ -10,7 +10,6 @@
   function hex(buf) { return Array.prototype.map.call(new Uint8Array(buf), function (x) { return ('0' + x.toString(16)).slice(-2); }).join(''); }
   function neueId() { var b = new Uint8Array(12); crypto.getRandomValues(b); return hex(b); }
   function emailOk(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v || '').trim()); }
-  function telefonOk(v) { return (String(v || '').match(/\d/g) || []).length >= 6; }
   function tx(k) { return TS[k] || ''; }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function modus() { return K.testmodus ? 'test' : 'messe'; }
@@ -96,6 +95,7 @@
   }
   function pinVergessen() {
     return allesLoeschen().then(function () { return window.Anmeldungen ? window.Anmeldungen.allesLoeschen() : null; })
+      .then(function () { return window.Lieferant ? window.Lieferant.allesLoeschen() : null; })
       .then(function () { try { localStorage.removeItem(pinSchluessel()); } catch (e) { } });
   }
   function namenSchluessel() { return 'messe-app-standteam-' + modus(); }
@@ -136,7 +136,7 @@
   function fehlendePflicht(e) {
     var f = [], em = String(e.email || '').trim();
     if (em && !emailOk(em)) f.push({ schritt: 1, text: 'E-Mail-Adresse (ungültig)' });
-    if (!emailOk(em) && !telefonOk(e.telefon) && !telefonOk(e.mobil)) f.push({ schritt: 1, text: 'E-Mail oder Telefon' });
+    else if (!em) f.push({ schritt: 1, text: 'E-Mail-Adresse' });
     if (!einzeilig(e.einrichtung)) f.push({ schritt: 1, text: 'Labor / Firma / Einrichtung / Klinik' });
     if (!W.bereich[e.typ]) f.push({ schritt: 1, text: 'Einrichtungstyp' });
     if (!e.land) f.push({ schritt: 1, text: 'Land' });
@@ -266,7 +266,8 @@
   var TEST_ABLAGEN = [
     { db: 'messe-app-gespraeche-test', store: 'gespraeche', text: 'Test-Gespräche' },
     { db: 'messe-app-test', store: 'warteschlange', text: 'Test-Anmeldungen, die auf Netz warten' },
-    { db: 'messe-app-anmeldungen-test', store: 'anmeldungen', text: 'Gespeicherte Test-Anmeldungen (v0.5.3)' }
+    { db: 'messe-app-anmeldungen-test', store: 'anmeldungen', text: 'Gespeicherte Test-Anmeldungen (v0.5.3)' },
+    { db: 'messe-app-lieferanten-test', store: 'lieferanten', text: 'Test-Lieferantenkontakte mit Kartenfotos (v0.6.0)' }
   ];
   function testSchluesselLs() {
     var l = [];
@@ -292,7 +293,7 @@
   function testdatenZaehlen() {
     return Promise.all(TEST_ABLAGEN.map(function (a) { return testAblage(a, false); })).then(function (n) {
       var ls = testSchluesselLs();
-      return { gespraeche: n[0], warteschlange: n[1], anmeldungen: n[2], pin: ls.some(function (k) { return /pin-test$/.test(k); }),
+      return { gespraeche: n[0], warteschlange: n[1], anmeldungen: n[2], lieferanten: n[3], pin: ls.some(function (k) { return /pin-test$/.test(k); }),
         namen: ls.some(function (k) { return /standteam-test$/.test(k); }), zaehler: ls.some(function (k) { return /-nr-test-/.test(k); }), browserspeicher: ls.length };
     });
   }
@@ -305,6 +306,9 @@
   var API = {
     testdatenZaehlen: testdatenZaehlen, testdatenLoeschen: testdatenLoeschen,
     datenBauen: datenBauen, fehlendePflicht: fehlendePflicht, anmeldungBauen: anmeldungBauen, csvBauen: csvBauen, SPALTEN: SPALTEN,
+    zelle: zelle, emailOk: emailOk, einzeilig: einzeilig, mehrzeilig: mehrzeilig, datumText: datumText, uhrText: uhrText, jjjjmmtt: jjjjmmtt,
+    nutzbar: function () { return !!G.aktiv && (K.testmodus || !!G.texteGeprueft); },
+    pinDann: function () { }, pinNeuDann: function () { },
     dateiname: dateiname, betreff: betreff, ablegen: ablegen, uebergeben: uebergeben, nurSpeichern: nurSpeichern, AUSGAENGE: AUSGAENGE, pinOk: pinOk, liste: liste, anzahl: anzahl, aeltestes: aeltestes, loeschen: loeschen,
     pinGesetzt: pinGesetzt, pinFestlegen: pinFestlegen, pinPruefen: pinPruefen, pinVergessen: pinVergessen, naechsteNr: naechsteNr,
     standteamNamen: standteamNamen, standteamEigen: standteamEigen, standteamSpeichern: standteamSpeichern, _namenSchluessel: namenSchluessel,
@@ -427,7 +431,8 @@
     if (p1 !== p2) { meldung('gPinMeldung', tx('pinUngleich'), true); return; }
     pinFestlegen(p1).then(function () {
       $('g_pin1').value = ''; $('g_pin2').value = '';
-      if (nachPinNeu === 'namen') namenZeigen(); else if (nachPinNeu === 'testdaten') testdatenZeigen(); else gespraechStarten();
+      if (typeof nachPinNeu === 'function') nachPinNeu();
+      else if (nachPinNeu === 'namen') namenZeigen(); else if (nachPinNeu === 'testdaten') testdatenZeigen(); else gespraechStarten();
       nachPinNeu = 'gespraech';
     });
   }
@@ -504,11 +509,12 @@
     document.querySelectorAll('#gUebergabe .spalte-angaben, #gUebergabe .einw-rollen, #gUebergabe .formular-inhalt').forEach(function (s) { s.scrollTop = 0; });
   }
   function spracheGeaendert() { if ($('gUebergabe').classList.contains('aktiv')) uebergabeAktualisieren(); }
-  function pinFragen(zweck) {
+  function pinFragen(zweck, text) {
     pinZweck = zweck;
-    $('gPinFrageText').textContent = zweck === 'export' ? tx('pinFrageExport') : (zweck === 'namen' ? tx('pinFrageNamen') : (zweck === 'testdaten' ? tx('pinFrageTestdaten') : tx('pinFrageZurueck')));
+    var fn = typeof zweck === 'function';
+    $('gPinFrageText').textContent = fn ? (text || '') : (zweck === 'export' ? tx('pinFrageExport') : (zweck === 'namen' ? tx('pinFrageNamen') : (zweck === 'testdaten' ? tx('pinFrageTestdaten') : tx('pinFrageZurueck'))));
     $('g_pin_frage').value = ''; meldung('gPinFrageMeldung', '');
-    $('gPinVergessen').style.display = zweck === 'export' ? '' : 'none';
+    $('gPinVergessen').style.display = (zweck === 'export' || fn) ? '' : 'none';
     $('gPinFrage').classList.add('an');
     setTimeout(function () { $('g_pin_frage').focus(); }, 60);
   }
@@ -518,6 +524,7 @@
     pinPruefen(pin).then(function (ok) {
       if (!ok) { meldung('gPinFrageMeldung', tx('pinFalsch'), true); return; }
       $('gPinFrage').classList.remove('an'); pinZweck = null;
+      if (typeof zweck === 'function') zweck();
       if (zweck === 'zurueck') { A.zeige('gespraech'); schrittZeigen(3); }
       if (zweck === 'export') exportZeigen();
       if (zweck === 'namen') namenZeigen();
@@ -530,7 +537,7 @@
     pinFragen('testdaten');
   }
   function tdListe(z) {
-    var zeilen = [[TEST_ABLAGEN[0].text, z.gespraeche], [TEST_ABLAGEN[1].text, z.warteschlange], [TEST_ABLAGEN[2].text, z.anmeldungen],
+    var zeilen = [[TEST_ABLAGEN[0].text, z.gespraeche], [TEST_ABLAGEN[1].text, z.warteschlange], [TEST_ABLAGEN[2].text, z.anmeldungen], [TEST_ABLAGEN[3].text, z.lieferanten],
       ['Test-Namen des Standteams', z.namen ? 'gespeichert' : 'keine'], ['Test-Messe-PIN', z.pin ? 'gespeichert' : 'keine'],
       ['Einträge im Browserspeicher (Test)', z.browserspeicher]];
     $('gTdListe').innerHTML = zeilen.map(function (r) { return '<tr><td>' + esc(r[0]) + '</td><td>' + esc(String(r[1])) + '</td></tr>'; }).join('');
@@ -544,7 +551,7 @@
     $('gTdFrage').classList.remove('an');
     testdatenLoeschen().then(function (z) {
       tdListe(z);
-      var leer = !z.gespraeche && !z.warteschlange && !z.anmeldungen && !z.browserspeicher;
+      var leer = !z.gespraeche && !z.warteschlange && !z.anmeldungen && !z.lieferanten && !z.browserspeicher;
       meldung('gTdMeldung', leer ? tx('tdFertig') : 'Nicht alles gelöscht – bitte Technik informieren.', !leer);
       $('gTdStart').style.display = 'none';
       startZeigen();
@@ -725,6 +732,8 @@
     exportZustand(''); meldung('gExportMeldung', usb ? tx('exportNochNichtUsb') : tx('exportNochNicht'), usb);
   });
   API.leeren = leeren; API.seiteAktiv = seiteAktiv; API.spracheGeaendert = spracheGeaendert;
+  API.pinDann = function (text, fn) { pinFragen(fn, text); };
+  API.pinNeuDann = function (fn) { if (pinGesetzt()) fn(); else pinNeuZeigen(fn); };
   startZeigen();
   setInterval(function () { if ($('start').classList.contains('aktiv')) startZeigen(); }, 60000);
   function demoFuellen(vk) {

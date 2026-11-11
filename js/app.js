@@ -101,6 +101,7 @@
     clearInterval(dankeTimer);
     leeren();
     if (window.Gespraech) window.Gespraech.leeren();
+    if (window.Lieferant) window.Lieferant.leeren();
     setzeSprache(K.standardSprache);
     zeige('start');
     neuLadenWennRuhig();
@@ -113,7 +114,7 @@
   }
   function leerlauf() {
     clearTimeout(leerTimer);
-    var imGespraech = window.Gespraech && window.Gespraech.seiteAktiv();
+    var imGespraech = (window.Gespraech && window.Gespraech.seiteAktiv()) || (window.Lieferant && window.Lieferant.seiteAktiv());
     var sek = imGespraech ? ((K.gespraech || {}).leerlaufSekunden || K.leerlaufSekunden) : K.leerlaufSekunden;
     leerTimer = setTimeout(function () {
       if (!$('start').classList.contains('aktiv') || lang !== K.standardSprache) neu();
@@ -298,7 +299,7 @@
   }
   var vkAusschnittBild = null;
   function vkPruefWeg() {
-    ['vkPruef', 'gVkPruef'].forEach(function (i) { var e = $(i); if (e) { e.innerHTML = ''; e.classList.remove('an'); } });
+    ['vkPruef', 'gVkPruef', 'lVkPruef'].forEach(function (i) { var e = $(i); if (e) { e.innerHTML = ''; e.classList.remove('an'); } });
     if (vkAusschnittBild) { VK._verwerfen(vkAusschnittBild); vkAusschnittBild = null; }
     $('vkAusschnittBild').innerHTML = ''; $('vkAusschnitt').classList.remove('an');
   }
@@ -452,6 +453,7 @@
       vkAusschnittBild = document.createElement('canvas'); vkAusschnittBild.width = bild.width; vkAusschnittBild.height = bild.height;
       vkAusschnittBild.getContext('2d').drawImage(bild, 0, 0);
     }
+    if (vkZiel.fotoBehalten) { try { vkZiel.fotoBehalten(bild); } catch (e) { } }
     VK.erkennen(bild, { mitTelPos: vkZiel.telPos(), zeitlimitSekunden: (K.visitenkarte || {}).zeitlimitSekunden, rohtext: !!(K.testmodus && diag) }).then(function (erg) {
       if (nr !== vkLaufNr) return;
       $('vkLesen').classList.remove('an');

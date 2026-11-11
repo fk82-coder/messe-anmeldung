@@ -1,7 +1,7 @@
 window.KONFIG = {
-  version: '0.5.4',
+  version: '0.6.1',
   testmodus: false,
-  messe: 'DVG 2026',
+  messe: 'MEDICA 2026',
   standardSprache: 'de',
   messeSprachen: ['de', 'en'],
   leerlaufSekunden: 90,
@@ -42,7 +42,7 @@ window.KONFIG = {
   },
   gespraech: {
     aktiv: true,
-    kuerzel: 'DVG26',
+    kuerzel: 'MED26',
     standteam: ['Standteam 1', 'Standteam 2', 'Standteam 3', 'Standteam 4'],
     standteamNameHoechstens: 40,
     empfaenger: 'a.fern@suesse.de',
@@ -92,6 +92,32 @@ window.KONFIG = {
       angebot: 'Angebot', muster: 'Muster', rueckruf: 'Rückruf (ausdrücklich gewünscht)', unterlagen: 'Unterlagen schicken',
       besuch: 'Besuch', nichts: 'nichts weiter'
     },
-    bewertung: { heiss: 'heiß', warm: 'warm', kalt: 'kalt' }
+    bewertung: { heiss: 'heiß', warm: 'warm', kalt: 'kalt' },
+    lieferant: {
+      sparten: [
+        { titel: 'Laborartikel', werte: {
+          objekttraeger: 'Objektträger', einbett: 'Einbettkassetten und Histologiebedarf', abstrich: 'Abstrichstäbe und Transportmedien',
+          probengefaesse: 'Röhrchen, Becher und Probengefäße', entnahme: 'Entnahmehilfen (z. B. Urinbeutel, Zytobürsten)',
+          laborbedarf: 'Pipettenspitzen, PCR und Laborverbrauchsmaterial' } },
+        { titel: 'Verpackung und Versand', werte: {
+          kartons: 'Versandkartons', transport: 'Transportbehälter', beutel: 'Beutel und Saugeinlagen', etiketten: 'Etiketten und Druckerzeugnisse' } },
+        { titel: 'Rohstoffe und Fertigung', werte: {
+          chemie: 'Chemikalien und Reagenzien', kunststoff: 'Kunststoffteile nach Zeichnung (Spritzguss, Blasformen)',
+          maschinen: 'Maschinen und Dienstleistung (Abfüllen, Sterilisation, Prüflabor)' } }
+      ],
+      sonstiges: 'Sonstiges / Neuheit',
+      art: { hersteller: 'Hersteller', haendler: 'Händler', dienstleister: 'Dienstleister' },
+      schonLieferant: { ja: 'ja', nein: 'nein' },
+      naechster: { katalog: 'Katalog oder Preisliste anfordern', muster: 'Muster anfordern', angebot: 'Angebot anfordern',
+        meldetSich: 'meldet sich nach der Messe', nichts: 'nichts weiter' },
+      einschaetzung: { interessant: 'interessant', vielleicht: 'vielleicht', nein: 'nein' }
+    }
+  },
+  lieferant: {
+    aktiv: true,
+    kuerzel: 'MED26',
+    fotoLaengsteSeite: 1280,
+    fotoGuete: 0.7,
+    notizHoechstens: 2000
   }
 };

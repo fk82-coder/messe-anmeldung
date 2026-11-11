@@ -1,8 +1,9 @@
-var VERSION = 'messe-app-0.5.4';
+var VERSION = 'messe-app-0.6.1';
 var DATEIEN = [
   './', 'index.html', 'ok.html', 'planb.html', 'manifest.webmanifest', 'css/app.css',
   'js/konfiguration.js', 'js/texte.js', 'js/laender.js', 'js/speicher.js', 'js/versand.js', 'js/visitenkarte.js', 'js/app.js', 'js/planb.js', 'js/ok.js',
   'js/gespraech.js',
+  'js/lieferant.js',
   'bilder/logo.png', 'bilder/symbol-192.png', 'bilder/symbol-512.png',
   'fonts/inter-400.woff2', 'fonts/inter-700.woff2'
 ];

@@ -358,3 +358,19 @@ input[type=email].vorschlag { background: #DCEBFD; border-color: #5B8FD6; }
   .g-leiste .knopf { min-width: 0; }
   .g-sch { font-size: .65em; padding: .35em .55em; }
 }
+#start.mit-gespraech .g-start-knoepfe.g-start-aus { flex-direction: row; flex-wrap: wrap; }
+#start.mit-gespraech #lLos { font-size: 1.1em; padding: .5em 1.3em; min-height: 2.5em; border-width: 2px; border-radius: 4px; }
+.g-start-info > span { display: block; }
+.g-start-links { display: flex; gap: 1.5em; flex-wrap: wrap; }
+@media (max-width: 759.98px) { #start.mit-gespraech #lLos { width: 100%; } }
+.l-foto { display: none; align-items: center; gap: .8em; }
+.l-foto.an { display: flex; }
+.l-foto canvas { border: 1px solid var(--linie); border-radius: 3px; background: #fff; max-width: 220px; height: auto; }
+.l-foto-text { font-size: .78em; line-height: 1.35; }
+.l-foto-text .link { min-height: 44px; }
+.l-sparten .l-block { flex: 0 0 100%; font-size: .78em; font-weight: 700; color: var(--blau); margin-top: .5em; }
+.l-sparten .l-block:first-child { margin-top: 0; }
+.l-sparten .l-block:empty { height: 0; margin-top: .3em; border-top: 1px dashed var(--linie); }
+.l-sonst-hinweis { display: none; margin: 0; font-size: .78em; font-weight: 700; color: var(--kupfertext); background: var(--kupferhell); border-left: 4px solid var(--kupfer); padding: .4em .6em; border-radius: 3px; }
+.l-sonst-hinweis.an { display: block; }
+.g-fehlt.gut { color: #1D6B2F; }
