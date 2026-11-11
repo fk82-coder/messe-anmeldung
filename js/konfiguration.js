@@ -113,6 +113,7 @@ window.KONFIG = {
       einschaetzung: { interessant: 'interessant', vielleicht: 'vielleicht', nein: 'nein' }
     }
   },
+  bruecke: { aktiv: true, ziel: 'http://localhost:8096/api/eingang.php', zeitlimitSekunden: 20, versuche: 4 },
   lieferant: {
     aktiv: true,
     kuerzel: 'MED26',

@@ -343,6 +343,7 @@
     e = null;
     try { localStorage.setItem(vonSchluessel(), chipWert('lVon')); } catch (x) { }
     ablegen(daten, bild, jetzt).then(function () {
+      if (window.Bruecke) window.Bruecke.senden('lieferant', daten, bild);
       daten = null; bild = null;
       speichertGerade = false; $('lWeiter').disabled = false;
       var von = chipWert('lVon');

@@ -573,6 +573,7 @@
     A.zeige('sendet');
     var crVorher = V.protokoll.length, erg = { n: null };
     ablegen(daten, jetzt).then(function () {
+      if (window.Bruecke) window.Bruecke.senden('kunde', daten, null);
       return anm ? V.anmelden(anm, lang, 'Messegespräch ' + nr).then(function (n) { erg.n = n; }) : null;
     }).then(function () {
       anm = null;
