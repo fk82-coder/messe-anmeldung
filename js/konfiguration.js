@@ -1,5 +1,5 @@
 window.KONFIG = {
-  version: '0.6.1',
+  version: '0.6.3',
   testmodus: false,
   messe: 'MEDICA 2026',
   standardSprache: 'de',
@@ -59,8 +59,9 @@ window.KONFIG = {
   sprachen: {
     de: { formular: 'https://flow.cleverreach.com/fl/4aed4e63-2aa9-4385-81f1-3ae894872176/confirm', text: 'Text DE v2', doi: 'DOI DE v1', freigegeben: true,
           formularVertrieb: 'https://flow.cleverreach.com/fl/57dc6291-59af-4c7f-8655-a42df71b9e53/confirm', textMitVertrieb: 'Text DE v3', doiVertrieb: 'DOI VK DE v1' },
-    en: { formular: 'FEHLT – Formular-Adresse EN', text: 'Text EN v2', doi: 'DOI EN v1', freigegeben: false,
-          formularVertrieb: 'FEHLT – Formular Vertriebskontakte EN', textMitVertrieb: 'Text EN v3', doiVertrieb: 'DOI VK EN v1' },
+    en: { formular: 'FEHLT – Formular-Adresse EN', text: 'Text EN v2', doi: 'DOI EN v1', freigegeben: true,
+          formularVertrieb: 'FEHLT – Formular Vertriebskontakte EN', textMitVertrieb: 'Text EN v3', doiVertrieb: 'DOI VK EN v1',
+          ersatzFormular: 'de' },
     es: { formular: 'FEHLT – Formular-Adresse ES', text: 'Text ES v2', doi: 'DOI ES v1', freigegeben: false },
     fr: { formular: 'FEHLT – Formular-Adresse FR', text: 'Text FR v2', doi: 'DOI FR v1', freigegeben: false },
     it: { formular: 'FEHLT – Formular-Adresse IT', text: 'Text IT v2', doi: 'DOI IT v1', freigegeben: false },

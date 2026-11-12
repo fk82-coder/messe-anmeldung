@@ -495,6 +495,7 @@
     $('gVertriebBox').classList.toggle('an', vt); $('gVertriebBox').classList.toggle('aus', !mitEmail);
     if (!vt) $('g_vertrieb').checked = false;
     $('gUnterKnopf').innerHTML = ($('g_haken').checked || $('g_vertrieb').checked) ? A.text('unterKnopfV3') : '';
+    $('gUnterKnopfDoi').textContent = V.ersatzHinweis(l, [$('g_haken').checked && 'newsletter', $('g_vertrieb').checked && 'vertrieb'].filter(Boolean));
     var offen = [];
     if (/<mark>/.test(V.dsText(l))) offen.push('Lücken 1/2 im Datenschutzhinweis');
     if (!G.texteGeprueft) offen.push('Texte zum Messegespräch nicht als Konrads geltende Fassung bestätigt (konfiguration.js texteGeprueft)');
@@ -569,6 +570,7 @@
     var jetzt = Date.now(), nr = naechsteNr(), lang = A.lang();
     var daten = datenBauen(e, jetzt, nr);
     var anm = (e.newsletter || e.vertrieb) ? anmeldungBauen(e) : null;
+    $('gDankeDoi').textContent = V.ersatzHinweis(lang, [e.newsletter && 'newsletter', e.vertrieb && 'vertrieb'].filter(Boolean));
     e = null;
     A.zeige('sendet');
     var crVorher = V.protokoll.length, erg = { n: null };

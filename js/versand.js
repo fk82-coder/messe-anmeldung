@@ -15,8 +15,8 @@
     return vertriebPruefen(lang).length === 0;
   }
   function vertriebPruefen(lang) {
-    var s = K.sprachen[lang] || {}, fehlt = [], tx = window.TEXTE[lang] || {}, namen = felderFuer(lang, 'vertrieb');
-    if (istFehlend(s.formularVertrieb)) fehlt.push('Formular Vertrieb');
+    var fehlt = [], tx = window.TEXTE[lang] || {}, namen = felderFuer(lang, 'vertrieb');
+    if (istFehlend(zielFuer('vertrieb', lang))) fehlt.push('Formular Vertrieb');
     ['email', 'quelle', 'sprache', 'anrede', 'vorname', 'nachname', 'einrichtung', 'bereich', 'interessen', 'land']
       .forEach(function (k) { if (istFehlend(namen[k])) fehlt.push('Feldname Vertrieb ' + k); });
     if (!tx.vertriebText || /Text folgt/.test(tx.vertriebText)) fehlt.push('Text Vertrieb');
@@ -56,19 +56,27 @@
     return vertriebVerfuegbar(lang) ? (s.textMitVertrieb || s.text) : s.text;
   }
   function quelle(lang, erfasstMs, offline, art) {
-    var s = K.sprachen[lang];
+    var s = K.sprachen[formularSprache(art, lang)];
     var doi = art === 'vertrieb' ? s.doiVertrieb : s.doi;
     return [K.messe, 'App ' + K.version, textKennung(lang), doi, 'erfasst ' + zeitText(erfasstMs)].join(' | ') + (offline ? ' | offline' : '');
   }
+  function formularSprache(art, lang) {
+    var s = K.sprachen[lang] || {}, eigen = art === 'vertrieb' ? s.formularVertrieb : s.formular;
+    return istFehlend(eigen) && s.ersatzFormular && K.sprachen[s.ersatzFormular] ? s.ersatzFormular : lang;
+  }
+  function ersatzHinweis(lang, arten) {
+    var t = (window.TEXTE[lang] || {}).doiHinweis;
+    return t && arten.some(function (a) { return formularSprache(a, lang) !== lang; }) ? t : '';
+  }
   function felderFuer(lang, art) {
-    var s = K.sprachen[lang] || {}, f = {}, k;
+    var s = K.sprachen[formularSprache(art, lang)] || {}, f = {}, k;
     for (k in K.felder) f[k] = K.felder[k];
     if (art === 'vertrieb' && K.felderVertrieb) for (k in K.felderVertrieb) f[k] = K.felderVertrieb[k];
     if (s.felder) for (k in s.felder) f[k] = s.felder[k];
     return f;
   }
   function zielFuer(art, lang) {
-    var s = K.sprachen[lang] || {};
+    var s = K.sprachen[formularSprache(art, lang)] || {};
     return art === 'vertrieb' ? s.formularVertrieb : s.formular;
   }
   function bereichText(eingabe) {
@@ -124,7 +132,7 @@
   function sprachePruefen(lang) {
     var s = K.sprachen[lang], namen = felderFuer(lang, 'newsletter'), fehlt = [];
     if (!s) return ['Sprache unbekannt'];
-    if (istFehlend(s.formular)) fehlt.push('Formular-Adresse');
+    if (istFehlend(zielFuer('newsletter', lang))) fehlt.push('Formular-Adresse');
     ['email', 'quelle', 'sprache'].forEach(function (k) { if (istFehlend(namen[k])) fehlt.push('Feldname ' + k); });
     ['anrede', 'vorname', 'nachname', 'einrichtung', 'bereich', 'interessen', 'land'].forEach(function (k) { if (istFehlend(namen[k])) fehlt.push('Feldname ' + k); });
     if (!s.freigegeben) fehlt.push('Freigabe Texte');
@@ -146,7 +154,7 @@
   var zuletztErreichbar = null;
   function erreichbar(lang) {
     if (K.testmodus) { zuletztErreichbar = Testnetz.an; return Promise.resolve(Testnetz.an); }
-    var ziel = (K.sprachen[lang || K.standardSprache] || {}).formular;
+    var ziel = zielFuer('newsletter', lang || K.standardSprache);
     if (istFehlend(ziel)) { zuletztErreichbar = navigator.onLine; return Promise.resolve(navigator.onLine); }
     var adresse = new URL(ziel, location.href).origin + '/';
     return mitZeitlimit(fetch(adresse, { method: 'GET', mode: 'no-cors', credentials: 'omit', cache: 'no-store', redirect: 'follow' }), 6000)
@@ -290,6 +298,7 @@
     gespraechAktiv: gespraechAktiv,
     angeboteneSprachen: angeboteneSprachen,
     istFehlend: istFehlend,
+    ersatzHinweis: ersatzHinweis,
     warnung: function () { return warnung; },
     erreichbar: erreichbar,
     zuletztErreichbar: function () { return zuletztErreichbar; },

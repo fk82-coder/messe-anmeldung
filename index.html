@@ -160,6 +160,7 @@
       <div class="knopfleiste">
         <button class="knopf knopf-braun" id="senden" disabled data-t="knopf"></button>
         <p class="unter-knopf" data-t="unterKnopf"></p>
+        <p class="unter-knopf doi-hinweis" id="unterKnopfDoi"></p>
       </div>
     </div>
   </main>
@@ -190,6 +191,7 @@
       <p class="gross" id="off2" data-t="off2"></p>
       <p class="klein" data-t="off3"></p>
     </div>
+    <p class="gross doi-hinweis" id="dankeDoi"></p>
     <div class="zaehler"><span data-t="geleert"></span> <b id="countdown">10</b> s</div>
     <div class="testuebertragung" id="testUebertragung"></div>
   </main>
@@ -389,6 +391,7 @@
       <div class="knopfleiste">
         <button class="knopf knopf-braun" id="gSenden" data-t="gKnopf"></button>
         <p class="unter-knopf" id="gUnterKnopf"></p>
+        <p class="unter-knopf doi-hinweis" id="gUnterKnopfDoi"></p>
       </div>
     </div>
   </main>
@@ -412,6 +415,7 @@
       <p class="gross" data-t="off1"></p>
       <p class="klein" data-t="off3"></p>
     </div>
+    <p class="gross doi-hinweis" id="gDankeDoi"></p>
     <p class="klein"><span data-t="gDankeNr"></span> <b id="gNr"></b></p>
     <div class="zaehler"><span data-t="geleert"></span> <b id="gCountdown">10</b> s</div>
     <div class="testuebertragung" id="gTestUebertragung"></div>
@@ -573,8 +577,8 @@
   <span id="gStatus" class="wartend"></span>
   <span id="testleiste" class="testleiste"></span>
   <span id="warnung" class="warnung"></span>
-  <span class="fuss-ver-handy">Messe-App <b id="versionHandy"></b></span>
-  <span class="fuss-rechts">Anbieter: Süsse Labortechnik GmbH &amp; Co. KG · Impressum: www.suesse.de/impressum · Messe-App <b id="version"></b> · <span data-t="nichts"></span></span>
+  <span class="fuss-ver-handy"><span data-t="fussApp"></span> <b id="versionHandy"></b></span>
+  <span class="fuss-rechts"><span data-t="fussAnbieter"></span> · <span data-t="fussApp"></span> <b id="version"></b> · <span data-t="nichts"></span></span>
 </footer>
 <script src="js/konfiguration.js"></script>
 <script src="js/texte.js"></script>

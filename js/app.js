@@ -78,6 +78,7 @@
     if (!vertriebAn()) $('f_vertrieb').checked = false;
     $('senden').innerHTML = text(vertriebAn() ? 'knopfV3' : 'knopf');
     document.querySelector('.unter-knopf').innerHTML = text(vertriebAn() ? 'unterKnopfV3' : 'unterKnopf');
+    $('unterKnopfDoi').textContent = V.ersatzHinweis(lang, vertriebAn() ? ['newsletter', 'vertrieb'] : ['newsletter']);
   }
   $('f_vertrieb').addEventListener('change', pruefen);
   function leeren() {
@@ -217,6 +218,7 @@
       telefon: mitTelPos ? $('f_telefon').value : '', position: mitTelPos ? $('f_position').value : '',
       newsletter: $('f_haken').checked, vertrieb: vertrieb
     };
+    $('dankeDoi').textContent = V.ersatzHinweis(lang, [eingabe.newsletter && 'newsletter', eingabe.vertrieb && 'vertrieb'].filter(Boolean));
     zeige('sendet');
     V.anmelden(eingabe, lang).then(function (erg) {
       eingabe = null;
@@ -608,6 +610,7 @@
     if (q.s === 'danke' || q.s === 'dankeoffline') {
       var off = q.s === 'dankeoffline';
       $('dankeOnline').style.display = off ? 'none' : ''; $('dankeOffline').style.display = off ? '' : 'none';
+      $('dankeDoi').textContent = V.ersatzHinweis(lang, ['newsletter']);
       zeige('danke');
       return;
     }

@@ -33,15 +33,15 @@
   var DS_EN =
     '<p><b>Controller:</b> Süsse Labortechnik GmbH &amp; Co. KG, Kasseler Straße 76, 34281 Gudensberg, Germany, telephone +49 5603 502-0, info@suesse.de<br><b>Data Protection Officer:</b> Stefan Pietsch, Pietsch IT GmbH, Wilhelmshöher Straße 1, 34590 Wabern, Germany, datenschutz@pietsch-it.de</p>' +
     '<p><b>Purpose:</b> We will send you our email newsletter containing information on products, new releases, offers and events. To do this, we use your email address and, if you provide them, your title, name, lab/company/institution/hospital, field, interests and country, so that we can address you personally and send you content that suits your field, interests and country. The legal basis is your consent (Article 6(1)(a) GDPR).</p>' +
-    '<p><b>Contact from our sales team (only if you have ticked the second box):</b> {{VERTRIEB_SATZ1}} The legal basis is your consent (Article 6(1)(a) GDPR). Only the relevant Süsse staff receive this information; the confirmation email is sent by CleverReach on our behalf. We store your details until you withdraw your consent and then delete them from the customer database. We retain only proof of your consent (email address, date and place, version of the consent text, time of your confirmation) for a further six months and then delete it. If you become a customer, the statutory retention periods apply to orders and invoices.</p>' +
+    '<p><b>Contact from our sales team (only if you have ticked the second box):</b> {{VERTRIEB_SATZ1}} The legal basis is your consent (Article 6(1)(a) GDPR). Only the relevant Süsse staff receive this information; the confirmation email is sent by CleverReach on our behalf. We store the details until you withdraw your consent and then delete them. If you become a customer, the statutory retention periods apply to orders and invoices.</p>' +
     '<p><b>Withdrawal of consent (sales):</b> At any time and without formality, for example by replying briefly to an email from our sales team or by telephone on +49 5603 502-0. The withdrawal takes effect for the future.</p>' +
     '<p><b>Proof of consent:</b> We record when and where (trade fair) you registered, which consent text you saw, the confirmation email and your confirmation. This allows us to prove your consent. The legal basis is our legitimate interest in this proof (Article 6(1)(f) GDPR).</p>' +
-    '<p><b>Confirmation:</b> You will receive an email with a confirmation link. We only register you after you have confirmed. If you do not confirm, we delete your details after ' + GAP(1, 'period from CleverReach, to be added') + '.</p>' +
-    '<p><b>At the stand:</b> If the tablet is not connected to the internet, or if the transfer has not been reliably confirmed, your registration is stored temporarily on the tablet in encrypted form. Only this app can read it. It is transferred automatically as soon as the tablet is back online and then deleted from the tablet immediately. If the transfer does not succeed within three days, it is deleted.</p>' +
+    '<p><b>Confirmation:</b> You will receive an email with a confirmation link. We only register you after you have confirmed. If you do not confirm, we delete your details after one month.</p>' +
+    '<p><b>At the stand:</b> For security, your registration is stored temporarily on the tablet in encrypted form. Only this app can read it. It is transferred automatically as soon as the tablet is online. It then remains encrypted on the tablet until we have made sure after the trade fair that CleverReach has received your registration; if necessary, we send it again for this purpose. It is then deleted, at the latest one month after your registration.</p>' +
     '{{VISITENKARTE}}' +
-    '<p><b>Recipient:</b> CleverReach GmbH &amp; Co. KG, Schafjückenweg 2, 26180 Rastede, Germany, sends the emails on our behalf (data processing under Article 28 GDPR). ' + GAP(2, 'confirm from the data processing agreement, then insert: “No personal data is transferred to countries outside the EU.”') + ' We do not pass your data on to anyone else.</p>' +
+    '<p><b>Recipient:</b> CleverReach GmbH &amp; Co. KG, Schafjückenweg 2, 26180 Rastede, Germany, sends the emails on our behalf (data processing under Article 28 GDPR). CleverReach stores the data in data centres in Germany and Ireland. One of CleverReach\'s service providers is the US company Amazon Web Services, Inc.; if data is transferred to the USA in this context, the European Commission\'s adequacy decision on the EU-U.S. Data Privacy Framework applies (Article 45 GDPR). We do not pass your data on to anyone else.</p>' +
     '<p><b>No tracking:</b> We do not measure whether you open the newsletter or click on links in it.</p>' +
-    '<p><b>How long:</b> Until you withdraw your consent. We then delete your details. We retain only proof of your consent (email address, date and place of registration, version of the consent text, time of your confirmation) for a further six months and then delete it.</p>' +
+    '<p><b>How long:</b> Until you withdraw your consent. We then delete your details and the proof of your consent. Only your email address remains on a blocklist for as long as we send our newsletter via CleverReach, so that you no longer receive any newsletter from us. The legal basis for this is our legitimate interest in respecting your withdrawal (Article 6(1)(f) GDPR).</p>' +
     '<p><b>Withdrawal of consent:</b> At any time via the unsubscribe link in every email. The withdrawal takes effect for the future. Processing carried out before then remains lawful.</p>' +
     '<p><b>Your rights:</b> You have the right of access, rectification, erasure, restriction of processing and data portability. You may object to the storage of the proof of consent. You may lodge a complaint with a data protection supervisory authority, for example the Hessian Commissioner for Data Protection and Freedom of Information.</p>' +
     '<p><b>Voluntary:</b> All information is voluntary. Without an email address we cannot send you the newsletter. The content you receive is based solely on the information you provide; we do not analyse your behaviour. No automated decision-making takes place.</p>';
@@ -68,7 +68,7 @@
       b2: '<p class="ds-kasten"><b>Your right to object:</b> <b>You can object to the use of your details for advertising at any time, without giving reasons</b> – informally, for example by replying briefly to an email from our sales team or by calling +49 5603 502-0. We will then no longer use your details for advertising. You can also object, on grounds relating to your particular situation, to any other processing based on our legitimate interest (Article 21 GDPR).</p>',
       b3alt: 'your registration is stored temporarily on the tablet in encrypted form.',
       b3: 'your registration for the newsletter or for contact from our sales team is stored temporarily on the tablet in encrypted form.',
-      b3endeAlt: 'If the transfer does not succeed within three days, it is deleted.',
+      b3endeAlt: 'It is then deleted, at the latest one month after your registration.',
       b3zusatz: 'The note of your enquiry at our stand remains encrypted on the tablet until our stand team passes it on to our sales team by email; it is then deleted from the tablet.',
       b4: '<p><b>Business card (optional):</b> If you wish, the tablet photographs your own business card and reads the text itself in order to pre-fill the fields; during a conversation, our stand team does this with the card you give them for this purpose. Text recognition runs entirely on the tablet. The photo and the recognised text do not leave the tablet, are held only in its working memory and are discarded immediately. We only take your email address, first name, last name, lab/company/institution/hospital, telephone number and position, and, for an enquiry with a request for samples, also your postal address; we do not take any other details on the card. We never send your telephone number, position or postal address for the newsletter; our sales team only receives your telephone number and position if you tick the second box or as part of your enquiry. The suggested entries are checked before sending and can be changed or deleted. After that, we use the details in the same way as typed-in details (see “Purpose”, “Contact from our sales team” and “Your enquiry at our stand”). The legal basis for reading the card is our legitimate interest in saving the effort of typing (Article 6(1)(f) GDPR).</p>',
       b5alt: 'We do not pass your data on to anyone else.',
@@ -133,6 +133,7 @@
       off3: 'Spätestens einen Monat nach Ihrer Anmeldung löschen wir sie auf dem Tablet.',
       geleert: 'Das Formular wird geleert in',
       nichts: 'Auf dem Tablet wird Ihre Anmeldung spätestens nach einem Monat gelöscht.',
+      fussAnbieter: 'Anbieter: Süsse Labortechnik GmbH &amp; Co. KG · Impressum: www.suesse.de/impressum', fussApp: 'Messe-App',
       dsText: DS_DE,
       dsTeile: DS_TEILE.de,
       vkKnopf: 'Eigene Visitenkarte lesen lassen',
@@ -165,7 +166,7 @@
     },
     en: {
       sprachname: 'English',
-      rechtStand: 'Einwilligung, Offline-Texte, Vertriebstext v3 und Datenschutzhinweis EN geprüft (23.10.2026, Feldname angeglichen 25.10.2026); Lücken 1 und 2 und die Änderungen vom 27.10.2026 noch nicht übersetzt',
+      rechtStand: 'Einwilligung, Offline-Texte, Vertriebstext v3 und Datenschutzhinweis EN geprüft (23.10.2026); Änderungen vom 27. und 29.10.2026 übersetzt und geprüft (12.11.2026)',
       testHinweis: 'Test version – registration not possible. No data is sent.',
       titel: 'Subscribe to our newsletter',
       untertitel: 'We write when there is something to say – and no more often.',
@@ -177,7 +178,7 @@
       nlHinweis: 'You can unsubscribe at any time with one click. We do not pass your address on to third parties.',
       los: 'Subscribe now ›',
       v1: '✓ Only your email is required', v2: '✓ Unsubscribe at any time',
-      v3: '✓ Sent encrypted, nothing left on the tablet afterwards',
+      v3: '✓ Sent encrypted',
       abbrechen: 'Cancel', zurueck: '‹ Back',
       angabenTitel: 'Your details', pflichtHinweis: 'Only your email address is required. Everything else is optional.',
       email: 'Email address', emailFalsch: 'Please check your email address.',
@@ -205,17 +206,19 @@
       unterKnopf: 'You will receive an email with a confirmation link. We will only add you once you have confirmed.',
       nlSprache: 'Our newsletter is published in German and English.',
       dsLink: 'Read privacy information ›', dsTitel: 'Privacy information: newsletter and sales contact', schliessen: 'Close',
-      offlineVor: 'This tablet is not connected to the internet at the moment. Your subscription will be stored on the tablet in encrypted form and sent automatically as soon as we are back online. It will then be deleted here immediately.',
+      offlineVor: 'This tablet is not connected to the internet at the moment. Your subscription will be stored on the tablet in encrypted form and sent automatically as soon as we are back online.',
       moment: 'One moment please …', uebertragen: 'Your subscription is being sent.',
       danke: 'Thank you!',
       danke1: 'Please open your inbox now and click the confirmation link.',
       danke2: 'We will only add you once you have confirmed.',
       spam: 'No email? Please also check your spam folder.',
+      doiHinweis: 'Please note: our confirmation emails are currently in German. Please click the link in each email to confirm.',
       off1: 'Your subscription has been stored in encrypted form and will be sent as soon as we are back online, probably later today.',
       off2: 'You will then receive the email with the confirmation link. We will only add you once you have confirmed.',
-      off3: 'If the transfer does not succeed within three days, we will delete your details.',
+      off3: 'We delete it from the tablet at the latest one month after your registration.',
       geleert: 'This form will be cleared in',
-      nichts: 'After the transfer, nothing remains on this tablet.',
+      nichts: 'On the tablet, your registration is deleted after one month at the latest.',
+      fussAnbieter: 'Provider: Süsse Labortechnik GmbH &amp; Co. KG · Legal notice: www.suesse.de/impressum', fussApp: 'Trade fair app',
       dsText: DS_EN,
       dsTeile: DS_TEILE.en,
       vkKnopf: 'Read my business card',
