@@ -5,6 +5,7 @@
    Der Token steht nicht im Code: das Tablet bekommt ihn einmal über index.html#bruecke-token=… */
 (function () {
   var K = window.KONFIG || {}, B = K.bruecke || {};
+  var ZIEL = (location.hostname === 'localhost' && B.zielLokal) ? B.zielLokal : B.ziel; // lokaler Stack (tools/lokal.sh)
   var SCHLUESSEL = 'messe-app-bruecke-token';
   function token() { try { return localStorage.getItem(SCHLUESSEL) || ''; } catch (e) { return ''; } }
   function tokenAusAdresse() {
@@ -45,7 +46,7 @@
   function einmal(body) {
     var steuer = window.AbortController ? new AbortController() : null;
     var t = setTimeout(function () { if (steuer) steuer.abort(); }, (B.zeitlimitSekunden || 20) * 1000);
-    return fetch(B.ziel, {
+    return fetch(ZIEL, {
       method: 'POST', mode: 'cors', credentials: 'omit', cache: 'no-store', redirect: 'error',
       headers: { 'Content-Type': 'application/json', 'X-Messe-Token': token() }, body: body, signal: steuer ? steuer.signal : undefined
     }).then(function (r) {
@@ -64,9 +65,18 @@
       return 'fehler';
     });
   }
+  /* Gerätekennung des Tablets: derselbe Wert, den das Lieferanten-Formular nutzt (localStorage 'messe-app-geraet',
+     angelegt von Lieferant.geraet()). Kunden-Nr. zählen je Tablet; erst mit dem Gerät sind sie am Server unterscheidbar.
+     Nur in der Übertragung, nicht in der Tablet-Ablage und nicht im CSV (beides bleibt Freds Format). */
+  function geraet() {
+    try { if (window.Lieferant && window.Lieferant.geraet) return window.Lieferant.geraet(); } catch (e) { }
+    try { var g = localStorage.getItem('messe-app-geraet') || ''; if (/^[A-Z2-9]{4}$/.test(g)) return g; } catch (e) { }
+    return '';
+  }
   /* formular: 'kunde' | 'lieferant'; daten: Ergebnis von datenBauen(); bild: Blob oder null. Wirft nie. */
   function senden(formular, daten, bild) {
-    if (!B.aktiv || !B.ziel) return Promise.resolve('aus');
+    if (!B.aktiv || !ZIEL) return Promise.resolve('aus');
+    if (formular === 'kunde' && daten) daten = Object.assign({}, daten, { geraet: geraet() }); // Kopie: Freds Objekt bleibt unberührt
     if (!token()) { hinweis('Übertragung an Süsse nicht eingerichtet (Token fehlt). Eintrag liegt auf dem Tablet.', 'fehler'); return Promise.resolve('ohne-token'); }
     var id = uuid(), nr = (daten && daten.nr) || '';
     return (bild ? base64(bild) : Promise.resolve(null)).then(function (b) {
