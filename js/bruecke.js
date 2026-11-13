@@ -5,7 +5,7 @@
    Der Token steht nicht im Code: das Tablet bekommt ihn einmal über index.html#bruecke-token=… */
 (function () {
   var K = window.KONFIG || {}, B = K.bruecke || {};
-  var ZIEL = (location.hostname === 'localhost' && B.zielLokal) ? B.zielLokal : B.ziel; // lokaler Stack (tools/lokal.sh)
+  var ZIEL = B.ziel;
   var SCHLUESSEL = 'messe-app-bruecke-token';
   function token() { try { return localStorage.getItem(SCHLUESSEL) || ''; } catch (e) { return ''; } }
   function tokenAusAdresse() {
