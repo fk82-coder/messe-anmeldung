@@ -18,7 +18,7 @@ Geändert sind nur: `js/bruecke.js` (neu), je eine Aufrufzeile in `js/gespraech.
    - **iPad:** App öffnen und kurz warten. Dann im App-Umschalter (vom unteren Rand nach oben wischen und halten) die App nach oben wegwischen. Wieder öffnen, wieder wegwischen, ein drittes Mal öffnen.
    - **Android:** App öffnen und kurz warten. Dann über „Zuletzt verwendet“ wegwischen. Noch zweimal öffnen und schließen, dann normal öffnen.
    - Die Versionsanzeige unten bleibt `v0.6.3`. Ob das Update angekommen ist, zeigt erst Schritt 5.
-4. **Token-Link öffnen.** Mano schickt dir einen Link `https://fk82-coder.github.io/messe-anmeldung/#bruecke-token=…` über einen eigenen Kanal, nicht per Mail. Öffne ihn **auf dem Tablet, auf dem du testest**. Das Tablet merkt sich den Token, und die Adresse verliert den Token-Teil gleich wieder. Den Link nicht weitergeben und nach dem Öffnen löschen.
+4. **Token-Link öffnen.** Mano schickt dir einen Link `https://fk82-coder.github.io/messe-anmeldung/#bruecke-token=…` über einen eigenen Kanal, nicht per Mail. Öffne ihn **auf dem Tablet, auf dem du testest**. Das Tablet merkt sich den Token, und die Adresse verliert den Token-Teil gleich wieder. Den Link nicht weitergeben. Löschen erst, wenn in Schritt 6 der erste blaue Hinweis erschienen ist.
    - **Android (Chrome):** Link in Chrome öffnen. Die installierte App teilt den Speicher mit Chrome und hat den Token danach auch.
    - **iPad:** Eine App auf dem Home-Bildschirm hat **einen eigenen Speicher, getrennt von Safari**. Ein Link aus Nachrichten oder Mail öffnet sich aber immer in Safari, also kommt der Token **nicht** in der Home-Bildschirm-App an. **Für diesen Test die App deshalb im Safari-Tab benutzen**, den der Link geöffnet hat. Nicht über das Symbol auf dem Home-Bildschirm.
 5. **Testeinträge machen** (in derselben App bzw. demselben Safari-Tab wie Schritt 4):
@@ -27,7 +27,7 @@ Geändert sind nur: `js/bruecke.js` (neu), je eine Aufrufzeile in `js/gespraech.
 6. **Erfolg erkennst du so:** Nach jedem Speichern erscheint unten ein **blauer** Hinweis `An Süsse übertragen: MED26-…` (bzw. `MED26-L-…`).
    - **Rot** „Token fehlt“ bedeutet: Schritt 4 ist nicht in dieser App angekommen. Beim iPad heißt das meist: Du bist in der Home-Bildschirm-App statt im Safari-Tab.
    - **Rot** „Nicht an Süsse übertragen (…)“ bedeutet: Der Server hat abgelehnt. Bitte den Text in Klammern notieren.
-   - **Gar kein Hinweis** bedeutet: Das Update ist noch nicht da, also Schritt 3 wiederholen.
+   - **Gar kein Hinweis** bedeutet: Das Update ist noch nicht da. **Android:** Schritt 3 wiederholen. **iPad (Safari-Tab):** den Token-Link aus Schritt 4 im Safari-Tab neu öffnen und den Eintrag wiederholen.
    - In jedem Fall liegt der Eintrag sicher auf dem Tablet.
 7. **An Mano melden:** Gerät (iPad oder Android, App oder Safari-Tab), Uhrzeit, die angezeigten Nummern und je Eintrag die Farbe und den Text des Hinweises. Bei Rot zusätzlich ein Bildschirmfoto.
 
@@ -57,23 +57,17 @@ git rev-parse origin/main              # muss cd7012c51917b651b5011e333b93e25719
 git merge-base --is-ancestor origin/main origin/bruecke-v063 && echo ok   # muss "ok" ausgeben, sonst STOPP
 ```
 
-### Schritt 2: Merge (Weg A **oder** B, nicht beide)
+### Schritt 2: Merge (lokal, kein Pull Request)
 
-A, lokal:
 ```sh
 git switch main
 git pull --ff-only origin main
+git rev-parse HEAD                     # muss cd7012c51917b651b5011e333b93e25719357742 sein, sonst STOPP (keine eigenen ungepushten Commits auf main)
 git merge --no-ff origin/bruecke-v063 -m "Merge bruecke-v063: Messe-Brücke auf v0.6.3"
 ```
-B, als Pull Request:
-```sh
-gh pr create --repo fk82-coder/messe-anmeldung --base main --head bruecke-v063 --title "Messe-Brücke auf v0.6.3" --body "siehe TABLET-TEST.md"
-gh pr merge --repo fk82-coder/messe-anmeldung --merge   # Merge-Commit, kein squash, kein rebase
-```
-
 **Bei einem Konflikt:** `git merge --abort`, STOPP, die Liste der Konfliktdateien an Mano melden. Nicht selbst auflösen.
 
-### Schritt 3: Prüfen **vor** dem Push (nur Weg A; bei Weg B dieselben Befehle nach `git pull` auf main)
+### Schritt 3: Prüfen **vor** dem Push
 
 ```sh
 grep -n localhost index.html js/konfiguration.js ; echo "exit=$?"     # keine Trefferzeile, exit=1
@@ -87,7 +81,7 @@ git diff --stat cd7012c HEAD                                        # nur: TABLE
 ```
 Weicht etwas ab: STOPP, nicht pushen.
 
-### Schritt 4: Push (nur Weg A)
+### Schritt 4: Push
 
 ```sh
 git push origin main
